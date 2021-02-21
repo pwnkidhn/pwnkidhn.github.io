@@ -2,7 +2,7 @@
 layout: post
 title: "BoB_CTF_porn_master"
 date: 2020-10-03
-categories: CTFwrite-up
+categories: CTF
 tags: [CTF, write-up, pwnable]
 ---
 
