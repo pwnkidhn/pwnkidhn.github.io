@@ -6,7 +6,7 @@ categories: DataStructure
 tags: [Data Structure, Array List, List]
 ---
 
-<center>Basic code of array List</center> 
+<center>Basic code of Array List</center> 
 
 ## Abstract Data Type
 ```c
