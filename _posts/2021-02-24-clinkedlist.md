@@ -10,7 +10,7 @@ tags: [Data Structure, Circular Linked List, List]
 
 ## Abstract Data Type
 ```c
-typedef int LData;
+typedef int Data;
 
 void ListInit(List* plist);
 - Initialize the list. should be called at first 
@@ -29,7 +29,7 @@ int LNext(List* plist, LData* pdata);
 - The Next data is saved on *pdata (using with while loop)
 - if there is no data return FALSE else TRUE.
     
-LData LRemove(List* plist);
+Data LRemove(List* plist);
 - Remove the data currently in the list and return the data.
     
 int LCount(List* plist);
