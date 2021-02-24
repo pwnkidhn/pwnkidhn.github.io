@@ -78,7 +78,7 @@ void SetSortRule(List* plist, int(*comp)(LData d1, LData d2));
 
 ## Implementation
 ```c
-#include<stdio.h>
+#include<stdlib.h>
 #include"DLinkedList.h"
 
 void ListInit(List* plist) {
@@ -167,6 +167,7 @@ void SetSortRule(List* plist, int(*comp)(LData d1, LData d2)) {
 ## Example Code
 ```c
 #include<stdio.h>
+#include<stdlib.h>
 #include"DLinkedList.h"
 
 int WhoIsPrecede(int d1, int d2) {
