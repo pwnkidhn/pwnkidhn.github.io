@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pwnkidhn.github.io/sitemap.xml
