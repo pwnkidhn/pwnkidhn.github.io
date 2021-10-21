@@ -9,8 +9,38 @@
     <atom:link href="https://pwnkidhn.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
     
     <description>Security Researcher / CTF Player</description>
-    <pubDate>Thu, 21 Oct 2021 12:53:50 GMT</pubDate>
+    <pubDate>Thu, 21 Oct 2021 13:05:40 GMT</pubDate>
     <generator>http://hexo.io/</generator>
+    
+    <item>
+      <title>What The Fuzz! (WTF)</title>
+      <link>https://pwnkidhn.github.io/2021/10/20/2021-10-21-WTF/</link>
+      <guid>https://pwnkidhn.github.io/2021/10/20/2021-10-21-WTF/</guid>
+      <pubDate>Wed, 20 Oct 2021 15:00:00 GMT</pubDate>
+      
+      <description>&lt;center&gt;What the fuzz 간단 정리 &lt;/center&gt;
+
+&lt;h2 id=&quot;What-is-Fuzzing&quot;&gt;&lt;a href=&quot;#What-is-Fuzzing&quot; class=&quot;headerlink&quot; title=&quot;What is Fuzzing?&quot;&gt;&lt;/a&gt;What is Fuzzing?&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Fuzzing or fuzz testing은 프로그램 내 잠재적 취약점을 찾는데 사용되는 자동화된 SW 기술.&lt;/li&gt;
+&lt;li&gt;Input이 있는 모든 SW는 Fuzzed 될 수 있음.&lt;/li&gt;
+&lt;/ul&gt;</description>
+      
+      
+      
+      <content:encoded><![CDATA[<center>What the fuzz 간단 정리 </center><h2 id="What-is-Fuzzing"><a href="#What-is-Fuzzing" class="headerlink" title="What is Fuzzing?"></a>What is Fuzzing?</h2><ul><li>Fuzzing or fuzz testing은 프로그램 내 잠재적 취약점을 찾는데 사용되는 자동화된 SW 기술.</li><li>Input이 있는 모든 SW는 Fuzzed 될 수 있음.</li></ul><span id="more"></span><h2 id="Why-Fuzzing"><a href="#Why-Fuzzing" class="headerlink" title="Why Fuzzing?"></a>Why Fuzzing?</h2><ul><li>Manual Testing시 tester의 역량에 따라 결과가 달라짐.</li><li>사람이 못하는 취약점을 찾을 수 있다.</li><li>Application이 복잡할 수록 attack surface가 많아지지만, 사람이 테스트 하기에 어려움.</li><li>이미 알려진 취약점이 다시 나오지 않도록 Regression testing 하는 데 사용.</li></ul><h2 id="Common-issues-with-fuzzing"><a href="#Common-issues-with-fuzzing" class="headerlink" title="Common issues with fuzzing"></a>Common issues with fuzzing</h2><ul><li>원하는 종류의 취약점을 발견하는데 까지 시간이 오래 걸릴 수 있다.</li><li>Smart Fuzzer(Input 구조를 알고 있는)를 사용하는데 몇 가지 작업이 좀 필요하다.</li><li>아무리 좋은 Fuzzer도 모든 취약점을 발견할 수 없다.</li><li>Fuzzing 결과에 취약점이 없다 해도 그 프로그램은 100% 안전한 게 아니다.</li><li>발견된 취약점은 검증이 반드시 필요하다.</li></ul><h2 id="What-in-needed-for-fuzzing"><a href="#What-in-needed-for-fuzzing" class="headerlink" title="What in needed for fuzzing?"></a>What in needed for fuzzing?</h2><ul><li>Input이 있는 Fuzzing 대상</li><li>찾고 싶은 취약점 종류</li><li>사용할 Fuzzer</li></ul><h2 id="What-types-of-bug-can-a-fuzzer-find"><a href="#What-types-of-bug-can-a-fuzzer-find" class="headerlink" title="What types of bug can a fuzzer find?"></a>What types of bug can a fuzzer find?</h2><ul><li>이론 상 모든 종류의 취약점을 찾을 수 있음</li><li>Logical Bug 보다 Memory Corruption 종류가 찾기 더 쉬움</li></ul><h2 id="Architecture-of-a-typical-fuzzer"><a href="#Architecture-of-a-typical-fuzzer" class="headerlink" title="Architecture of a typical fuzzer"></a>Architecture of a typical fuzzer</h2><ul><li>전형적인 Fuzzer의 3가지 구조.</li><li>Test Case Generator - Worker에서 사용할 input을 생성</li><li>Logger - bug분석에 필요한 모든 것을 기록 (input, 결과)</li><li>Worker - input을 가지고 fuzzing 실행, 버그 탐지</li></ul><p><img src="https://user-images.githubusercontent.com/49066484/138283140-7d929031-0f20-42ea-bce0-9d7efb2fe0f5.png" alt="fuzzer-architecture"></p><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><ul><li><a href="https://labs.f-secure.com/blog/what-the-fuzz/">https://labs.f-secure.com/blog/what-the-fuzz/</a></li></ul>]]></content:encoded>
+      
+      
+      <category domain="https://pwnkidhn.github.io/categories/Fuzzing/">Fuzzing</category>
+      
+      
+      <category domain="https://pwnkidhn.github.io/tags/fuzzing/">fuzzing</category>
+      
+      <category domain="https://pwnkidhn.github.io/tags/theory/">theory</category>
+      
+      
+      <comments>https://pwnkidhn.github.io/2021/10/20/2021-10-21-WTF/#disqus_thread</comments>
+      
+    </item>
     
     <item>
       <title>2021 Whitehatcon CTF</title>
