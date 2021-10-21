@@ -20,30 +20,36 @@
     var CONFIG = {"hostname":"pwnkidhn.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Security Researcher &#x2F; CTF Player">
-<meta property="og:type" content="website">
-<meta property="og:title" content="rvkhunLab">
-<meta property="og:url" content="https://pwnkidhn.github.io/page/2/index.html">
+  <meta name="description" content="glibc-2.23 malloc 분석  source : https:&#x2F;&#x2F;github.com&#x2F;andigena&#x2F;glibc-2.23-0ubuntu3&#x2F;blob&#x2F;master&#x2F;malloc&#x2F;malloc.c 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505">
+<meta property="og:type" content="article">
+<meta property="og:title" content="malloc (glibc-2.23)">
+<meta property="og:url" content="https://pwnkidhn.github.io/2020/08/02/2020-08-03-malloc_glibc_2_23/index.html">
 <meta property="og:site_name" content="rvkhunLab">
-<meta property="og:description" content="Security Researcher &#x2F; CTF Player">
+<meta property="og:description" content="glibc-2.23 malloc 분석  source : https:&#x2F;&#x2F;github.com&#x2F;andigena&#x2F;glibc-2.23-0ubuntu3&#x2F;blob&#x2F;master&#x2F;malloc&#x2F;malloc.c 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://blog.kakaocdn.net/dn/HnlUS/btqGgxxEs8l/kVQGWNjf5YntwOxxbM5UIK/img.png">
+<meta property="article:published_time" content="2020-08-02T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-10-21T14:26:21.444Z">
 <meta property="article:author" content="rvkhun">
+<meta property="article:tag" content="malloc">
+<meta property="article:tag" content="heap">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.kakaocdn.net/dn/HnlUS/btqGgxxEs8l/kVQGWNjf5YntwOxxbM5UIK/img.png">
 
-<link rel="canonical" href="https://pwnkidhn.github.io/page/2/">
+<link rel="canonical" href="https://pwnkidhn.github.io/2020/08/02/2020-08-03-malloc_glibc_2_23/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'en'
   };
 </script>
 
-  <title>rvkhunLab</title>
+  <title>malloc (glibc-2.23) | rvkhunLab</title>
   <meta name="google-site-verification" content="eBj8hDfb8V5sujjVERa_zAbaTQFLbQzowFQfUz3Rhw8">
   <meta name="naver-site-verification" content="7c18a15cd138e9448d263381fe6201215fc40046">
 
@@ -187,105 +193,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://pwnkidhn.github.io/2020/08/06/2020-08-07-free_glibc_2_23/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/raccoon1.jpg">
-      <meta itemprop="name" content="rvkhun">
-      <meta itemprop="description" content="Security Researcher / CTF Player">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="rvkhunLab">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/06/2020-08-07-free_glibc_2_23/" class="post-title-link" itemprop="url">free (glibc-2.23)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-08-07 00:00:00" itemprop="dateCreated datePublished" datetime="2020-08-07T00:00:00+09:00">2020-08-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-10-21 23:25:45" itemprop="dateModified" datetime="2021-10-21T23:25:45+09:00">2021-10-21</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Research/" itemprop="url" rel="index"><span itemprop="name">Research</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
 
     
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ul>
-<li>glibc-2.23 free 분석</li>
-</ul>
-<p><strong>source</strong> : <a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/andigena/glibc-2.23-0ubuntu3/blob/master/malloc/malloc.c">https://github.com/andigena/glibc-2.23-0ubuntu3/blob/master/malloc/malloc.c</a></p>
-<h2 id="libc-free"><a href="#libc-free" class="headerlink" title="__libc_free"></a>__libc_free</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span></span><br><span class="line">__libc_free (<span class="keyword">void</span> *mem)</span><br><span class="line">&#123;</span><br><span class="line">  mstate ar_ptr;</span><br><span class="line">  mchunkptr p;                          <span class="comment">/* chunk corresponding to mem */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> (*hook) (<span class="keyword">void</span> *, <span class="keyword">const</span> <span class="keyword">void</span> *)</span><br><span class="line">    = atomic_forced_read (__free_hook);</span><br><span class="line">  <span class="keyword">if</span> (__builtin_expect (hook != <span class="literal">NULL</span>, <span class="number">0</span>))</span><br><span class="line">    &#123;</span><br><span class="line">      (*hook)(mem, RETURN_ADDRESS (<span class="number">0</span>));</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// __free_hook 함수가 설정되어있으면 해당 함수 실행</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (mem == <span class="number">0</span>)                              <span class="comment">/* free(0) has no effect */</span></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">    <span class="comment">// free인자가 0일경우 종료 </span></span><br><span class="line"></span><br><span class="line">  p = mem2chunk (mem);</span><br><span class="line">  <span class="comment">// chunk의 header 주소를 p에 저장</span></span><br><span class="line">  <span class="keyword">if</span> (chunk_is_mmapped (p))   			<span class="comment">/* release mmapped memory. */</span></span><br><span class="line">  <span class="comment">// chunk에 is_mmapped flag가 설정되어있다면 아래 방식으로 해제 (분석중..)</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">/* see if the dynamic brk/mmap threshold needs adjusting */</span></span><br><span class="line">      <span class="keyword">if</span> (!mp_.no_dyn_threshold</span><br><span class="line">          &amp;&amp; p-&gt;size &gt; mp_.mmap_threshold</span><br><span class="line">          &amp;&amp; p-&gt;size &lt;= DEFAULT_MMAP_THRESHOLD_MAX)</span><br><span class="line">        &#123;</span><br><span class="line">          mp_.mmap_threshold = chunksize (p);</span><br><span class="line">          mp_.trim_threshold = <span class="number">2</span> * mp_.mmap_threshold;</span><br><span class="line">          LIBC_PROBE (memory_mallopt_free_dyn_thresholds, <span class="number">2</span>,</span><br><span class="line">                      mp_.mmap_threshold, mp_.trim_threshold);</span><br><span class="line">        &#125;</span><br><span class="line">      munmap_chunk (p);</span><br><span class="line">      <span class="comment">// munmap_chunk 함수 호출</span></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  ar_ptr = arena_for_chunk (p);</span><br><span class="line">  <span class="comment">// ar_ptr에 chunk의 메모리를 비워야 하는 부분을 저장</span></span><br><span class="line">  _int_free (ar_ptr, p, <span class="number">0</span>);</span><br><span class="line">  <span class="comment">// _int_free 함수 호출</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="int-free"><a href="#int-free" class="headerlink" title="_int_free"></a>_int_free</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span></span><br><span class="line">_int_free (mstate av, mchunkptr p, <span class="keyword">int</span> have_lock)</span><br><span class="line">&#123;</span><br><span class="line">  INTERNAL_SIZE_T size;        <span class="comment">// 특정 chunk의 size</span></span><br><span class="line">  mfastbinptr *fb;             <span class="comment">// 해제와 연관된 fastbin index</span></span><br><span class="line">  mchunkptr nextchunk;         <span class="comment">// 다음 index의 chunk</span></span><br><span class="line">  INTERNAL_SIZE_T nextsize;    <span class="comment">// 특정 chunk의 size</span></span><br><span class="line">  <span class="keyword">int</span> nextinuse;               <span class="comment">/* true if nextchunk is used */</span></span><br><span class="line">  INTERNAL_SIZE_T prevsize;    <span class="comment">/* size of previous contiguous chunk */</span></span><br><span class="line">  mchunkptr bck;               <span class="comment">/* misc temp for linking */</span></span><br><span class="line">  mchunkptr fwd;               <span class="comment">/* misc temp for linking */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">char</span> *errstr = <span class="literal">NULL</span>;</span><br><span class="line">  <span class="keyword">int</span> locked = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  size = chunksize (p);</span><br><span class="line">  <span class="comment">// size에 할당을 해제할 chunk(p)의 size를 저장</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment">/* Little security check which won&#x27;t hurt performance: the</span></span><br><span class="line"><span class="comment">     allocator never wrapps around at the end of the address space.</span></span><br><span class="line"><span class="comment">     Therefore we can exclude some size values which might appear</span></span><br><span class="line"><span class="comment">     here by accident or by &quot;design&quot; from some intruder.  */</span></span><br><span class="line">     </span><br><span class="line">  <span class="keyword">if</span> (__builtin_expect ((<span class="keyword">uintptr_t</span>) p &gt; (<span class="keyword">uintptr_t</span>) -size, <span class="number">0</span>)</span><br><span class="line">      || __builtin_expect (misaligned_chunk (p), <span class="number">0</span>))</span><br><span class="line">      <span class="comment">// chunk의 크기를 음수로 바꿔 chunk의 주소랑 비교,</span></span><br><span class="line">      <span class="comment">// 만약 작거나, 해제하려는 chunk가 align이 되지 않을 경우</span></span><br><span class="line">    &#123;</span><br><span class="line">      errstr = <span class="string">&quot;free(): invalid pointer&quot;</span>;</span><br><span class="line">      <span class="comment">// &quot;free(): invalid pointer&quot; exception 발생</span></span><br><span class="line">    errout:</span><br><span class="line">      <span class="keyword">if</span> (!have_lock &amp;&amp; locked)</span><br><span class="line">        (<span class="keyword">void</span>) mutex_unlock (&amp;av-&gt;mutex);</span><br><span class="line">      malloc_printerr (check_action, errstr, chunk2mem (p), av);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">  <span class="comment">/* We know that each chunk is at least MINSIZE bytes in size or a</span></span><br><span class="line"><span class="comment">     multiple of MALLOC_ALIGNMENT.  */</span></span><br><span class="line">     </span><br><span class="line">  <span class="keyword">if</span> (__glibc_unlikely (size &lt; MINSIZE || !aligned_OK (size)))</span><br><span class="line">  <span class="comment">// size가 chunk의 최소크기 보다 작거나, align되지 않을 경우</span></span><br><span class="line">    &#123;</span><br><span class="line">      errstr = <span class="string">&quot;free(): invalid size&quot;</span>;</span><br><span class="line">      <span class="comment">// &quot;free(): invaild size&quot; exception 발생</span></span><br><span class="line">      <span class="keyword">goto</span> errout;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  check_inuse_chunk(av, p);</span><br><span class="line">  <span class="comment">// 전달받은 chunk의 다음 chunk의 prev_inuse flag를 확인</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">/*</span></span><br><span class="line"><span class="comment">    If eligible, place chunk on a fastbin so it can be found</span></span><br><span class="line"><span class="comment">    and used quickly in malloc.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ((<span class="keyword">unsigned</span> <span class="keyword">long</span>)(size) &lt;= (<span class="keyword">unsigned</span> <span class="keyword">long</span>)(get_max_fast ())</span><br><span class="line">  <span class="comment">// size가 fastbin 크기일 경우</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> TRIM_FASTBINS</span></span><br><span class="line"><span class="comment">// TRIM_FASTBINS가 set되어 있을경우 해당 조건 추가</span></span><br><span class="line"><span class="comment">// TRIM_FASTBINS가 set되지 않을경우 해당 조건을 추가하지 않고 진행</span></span><br><span class="line">      <span class="comment">/*</span></span><br><span class="line"><span class="comment">	If TRIM_FASTBINS set, don&#x27;t place chunks</span></span><br><span class="line"><span class="comment">	bordering top into fastbins</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">      &amp;&amp; (chunk_at_offset(p, size) != av-&gt;top)</span><br><span class="line">      <span class="comment">// chunk의 다음 chunk가 topchunk가 아니면  </span></span><br><span class="line">      <span class="comment">// (topchunk 바로 위에 있는 fastbin size chunk는 건드리지 않는다)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">      ) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (__builtin_expect (chunk_at_offset (p, size)-&gt;size &lt;= <span class="number">2</span> * SIZE_SZ, <span class="number">0</span>)</span><br><span class="line">	|| __builtin_expect (chunksize (chunk_at_offset (p, size))</span><br><span class="line">			     &gt;= av-&gt;system_mem, <span class="number">0</span>))</span><br><span class="line">    <span class="comment">// 요청받은 chunk의 다음 chunk의 크기가 최소 크기보다 작거나, 최대 크기보다 클경우</span></span><br><span class="line">      &#123;</span><br><span class="line">      </span><br><span class="line">	<span class="comment">/* We might not have a lock at this point and concurrent modifications</span></span><br><span class="line"><span class="comment">	   of system_mem might have let to a false positive.  Redo the test</span></span><br><span class="line"><span class="comment">	   after getting the lock.  */</span></span><br><span class="line">       </span><br><span class="line">	<span class="keyword">if</span> (have_lock</span><br><span class="line">	    || (&#123; assert (locked == <span class="number">0</span>);</span><br><span class="line">		  mutex_lock(&amp;av-&gt;mutex);</span><br><span class="line">		  locked = <span class="number">1</span>;</span><br><span class="line">		  chunk_at_offset (p, size)-&gt;size &lt;= <span class="number">2</span> * SIZE_SZ</span><br><span class="line">		    || chunksize (chunk_at_offset (p, size)) &gt;= av-&gt;system_mem;</span><br><span class="line">	      &#125;))</span><br><span class="line">      <span class="comment">// __libc_free부터 넘겨받은 have_lock이 설정되어 있거나,</span></span><br><span class="line">      <span class="comment">// 다음 chunk size가 최소 크기보다 작거나, system_mem보다 크면</span></span><br><span class="line">	  &#123;</span><br><span class="line">	    errstr = <span class="string">&quot;free(): invalid next size (fast)&quot;</span>;</span><br><span class="line">        <span class="comment">// &quot;free(): invalid next size (fast)&quot; exception 발생</span></span><br><span class="line">	    <span class="keyword">goto</span> errout;</span><br><span class="line">	  &#125;</span><br><span class="line">	<span class="keyword">if</span> (! have_lock)</span><br><span class="line">    <span class="comment">// have_lock이 설정되어있지 않으면</span></span><br><span class="line">	  &#123;</span><br><span class="line">	    (<span class="keyword">void</span>)mutex_unlock(&amp;av-&gt;mutex);</span><br><span class="line">        <span class="comment">// mutex_unlock </span></span><br><span class="line">	    locked = <span class="number">0</span>; </span><br><span class="line">	  &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    free_perturb (chunk2mem(p), size - <span class="number">2</span> * SIZE_SZ);</span><br><span class="line">    <span class="comment">// 해당 chunk free</span></span><br><span class="line"></span><br><span class="line">    set_fastchunks(av);</span><br><span class="line">    <span class="comment">// 현재 arena에 FASTCHUNKS_BIT 설정</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> idx = fastbin_index(size);</span><br><span class="line">    <span class="comment">// size에 대한 fastbin index 저장</span></span><br><span class="line">    fb = &amp;fastbin (av, idx);</span><br><span class="line">    <span class="comment">// index에 맞는 fastbin 저장</span></span><br><span class="line">    <span class="comment">// idx에는 fastbinY의 index가 저장, fb에는 index의 bin list가 저장 </span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Atomically link P to its fastbin: P-&gt;FD = *FB; *FB = P;  */</span></span><br><span class="line">    mchunkptr old = *fb, old2;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> old_idx = ~<span class="number">0u</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">      &#123;</span><br><span class="line">	<span class="comment">/* Check that the top of the bin is not the record we are going to add</span></span><br><span class="line"><span class="comment">	   (i.e., double free).  */</span></span><br><span class="line">	<span class="keyword">if</span> (__builtin_expect (old == p, <span class="number">0</span>))</span><br><span class="line">    <span class="comment">// old = 이전에 해제한 포인터, p = 현재 해제할 포인터</span></span><br><span class="line">    <span class="comment">// old == p 라면 </span></span><br><span class="line">	  &#123;</span><br><span class="line">	    errstr = <span class="string">&quot;double free or corruption (fasttop)&quot;</span>;</span><br><span class="line">        <span class="comment">// &quot;double free or corruption (fasttop)&quot; exception 발생</span></span><br><span class="line">	    <span class="keyword">goto</span> errout;</span><br><span class="line">	  &#125;</span><br><span class="line">	<span class="comment">/* Check that size of fastbin chunk at the top is the same as</span></span><br><span class="line"><span class="comment">	   size of the chunk that we are adding.  We can dereference OLD</span></span><br><span class="line"><span class="comment">	   only if we have the lock, otherwise it might have already been</span></span><br><span class="line"><span class="comment">	   deallocated.  See use of OLD_IDX below for the actual check.  */</span></span><br><span class="line">       </span><br><span class="line">	<span class="keyword">if</span> (have_lock &amp;&amp; old != <span class="literal">NULL</span>)</span><br><span class="line">    <span class="comment">// have_lock이 설정되어있고, 이전에 해제한 chunk가 있다면(old가 NULL이 아니라면)</span></span><br><span class="line">	  old_idx = fastbin_index(chunksize(old));</span><br><span class="line">      <span class="comment">// old_idx에 old 크기에 맞는 fast bin index 저장</span></span><br><span class="line">	p-&gt;fd = old2 = old;</span><br><span class="line">    <span class="comment">// 현재 해제할 chunk의 fd와 old2에 이전에 해제한 chunk(old) 저장</span></span><br><span class="line">      &#125;</span><br><span class="line">    <span class="keyword">while</span> ((old = catomic_compare_and_exchange_val_rel (fb, p, old2)) != old2);</span><br><span class="line">    <span class="comment">// if(*fb == old2) &#123;*fb = p; return old2;&#125;가 될 때까지 반복.</span></span><br><span class="line">    <span class="comment">// 해제 요청을 받은 chunk를 fast bin에 넣는 작업</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (have_lock &amp;&amp; old != <span class="literal">NULL</span> &amp;&amp; __builtin_expect (old_idx != idx, <span class="number">0</span>))</span><br><span class="line">    <span class="comment">// have_lock이 설정되어있고, old가 NULL이 아니고, old_idx와 idx가 다르면</span></span><br><span class="line">      &#123;</span><br><span class="line">	errstr = <span class="string">&quot;invalid fastbin entry (free)&quot;</span>;</span><br><span class="line">    <span class="comment">// &quot;invalid fastbin entry (free)&quot; exception 발생</span></span><br><span class="line">	<span class="keyword">goto</span> errout;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    Consolidate other non-mmapped chunks as they arrive.</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (!chunk_is_mmapped(p)) &#123;</span><br><span class="line">  <span class="comment">// 해제할 chunk의 is_mmapped flag가 설정되어 있지 않으면,</span></span><br><span class="line">    <span class="keyword">if</span> (! have_lock) &#123;</span><br><span class="line">    <span class="comment">// have_lock이 set되어 있지 않다면,</span></span><br><span class="line">      (<span class="keyword">void</span>)mutex_lock(&amp;av-&gt;mutex);</span><br><span class="line">      locked = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    nextchunk = chunk_at_offset(p, size);</span><br><span class="line">    <span class="comment">// nextchunk에 해제할 chunk의 다음 chunk 저장</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Lightweight tests: check whether the block is already the</span></span><br><span class="line"><span class="comment">       top block.  */</span></span><br><span class="line">    <span class="keyword">if</span> (__glibc_unlikely (p == av-&gt;top))</span><br><span class="line">    <span class="comment">// 해제할 chunk가 top chunk 이면</span></span><br><span class="line">      &#123;</span><br><span class="line">	errstr = <span class="string">&quot;double free or corruption (top)&quot;</span>;</span><br><span class="line">	<span class="keyword">goto</span> errout;</span><br><span class="line">    <span class="comment">// &quot;double free or corruption(top)&quot; exception 발생</span></span><br><span class="line">      &#125;</span><br><span class="line">    <span class="comment">/* Or whether the next chunk is beyond the boundaries of the arena.  */</span></span><br><span class="line">    <span class="keyword">if</span> (__builtin_expect (contiguous (av)</span><br><span class="line">			  &amp;&amp; (<span class="keyword">char</span> *) nextchunk</span><br><span class="line">			  &gt;= ((<span class="keyword">char</span> *) av-&gt;top + chunksize(av-&gt;top)), <span class="number">0</span>))</span><br><span class="line">    <span class="comment">// 해제하려는 chunk의 크기만큼 뒤에 heap이 존재하는지 확인. 만약 없다면,</span></span><br><span class="line">      &#123;</span><br><span class="line">	errstr = <span class="string">&quot;double free or corruption (out)&quot;</span>;</span><br><span class="line">	<span class="keyword">goto</span> errout;</span><br><span class="line">    <span class="comment">// &quot;double free or corruption(out)&quot; exception 발생 </span></span><br><span class="line">      &#125;</span><br><span class="line">    <span class="comment">/* Or whether the block is actually not marked used.  */</span></span><br><span class="line">    <span class="keyword">if</span> (__glibc_unlikely (!prev_inuse(nextchunk)))</span><br><span class="line">    <span class="comment">// 해제하려는 다음 chunk의 prev_inuse가 설정되어 있지 않다면 </span></span><br><span class="line">      &#123;</span><br><span class="line">	errstr = <span class="string">&quot;double free or corruption (!prev)&quot;</span>;</span><br><span class="line">	<span class="keyword">goto</span> errout;</span><br><span class="line">    <span class="comment">// &quot;double free or corruption (!prev)&quot; exception 발생</span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    nextsize = chunksize(nextchunk);</span><br><span class="line">    <span class="comment">// 해제할 chunk의 다음 chunk의 크기를 nextsize에 저장</span></span><br><span class="line">    <span class="keyword">if</span> (__builtin_expect (nextchunk-&gt;size &lt;= <span class="number">2</span> * SIZE_SZ, <span class="number">0</span>)</span><br><span class="line">	|| __builtin_expect (nextsize &gt;= av-&gt;system_mem, <span class="number">0</span>))</span><br><span class="line">    <span class="comment">// nextchunk의 크기가 최소 크기보다 작거나, system_mem보다 크면</span></span><br><span class="line">      &#123;</span><br><span class="line">	errstr = <span class="string">&quot;free(): invalid next size (normal)&quot;</span>;</span><br><span class="line">	<span class="keyword">goto</span> errout;</span><br><span class="line">    <span class="comment">// &quot;free(): invalid next size(normal)&quot; exeception 발생</span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    free_perturb (chunk2mem(p), size - <span class="number">2</span> * SIZE_SZ);</span><br><span class="line">    <span class="comment">// 해제할 chunk를 free</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* consolidate backward */</span></span><br><span class="line">    <span class="keyword">if</span> (!prev_inuse(p)) &#123;</span><br><span class="line">    <span class="comment">// 해제할 chunk의 이전 chunk가 사용 중 이지 않을 경우</span></span><br><span class="line">      prevsize = p-&gt;prev_size;</span><br><span class="line">      size += prevsize;</span><br><span class="line">      p = chunk_at_offset(p, -((<span class="keyword">long</span>) prevsize));</span><br><span class="line">      unlink(av, p, bck, fwd);</span><br><span class="line">      <span class="comment">// 이전 chunk와 병합</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (nextchunk != av-&gt;top) &#123;</span><br><span class="line">    <span class="comment">// 해제할 chunk의 다음 chunk가 topchunk가 아닐 경우</span></span><br><span class="line">      <span class="comment">/* get and clear inuse bit */</span></span><br><span class="line">      nextinuse = inuse_bit_at_offset(nextchunk, nextsize);</span><br><span class="line">      <span class="comment">// 해제할 chunk의 다음 chunk의 다음 chunk의 prev_inuse flag를 저장</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">/* consolidate forward */</span></span><br><span class="line">      <span class="keyword">if</span> (!nextinuse) &#123;</span><br><span class="line">      <span class="comment">// 만약 해제할 chunk의 다음 chunk가 사용중이 아니라면,</span></span><br><span class="line">	unlink(av, nextchunk, bck, fwd);</span><br><span class="line">	size += nextsize;</span><br><span class="line">      &#125; <span class="keyword">else</span></span><br><span class="line">	clear_inuse_bit_at_offset(nextchunk, <span class="number">0</span>);</span><br><span class="line">    <span class="comment">// 다음 chunk와 병합</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">/*</span></span><br><span class="line"><span class="comment">	Place the chunk in unsorted chunk list. Chunks are</span></span><br><span class="line"><span class="comment">	not placed into regular bins until after they have</span></span><br><span class="line"><span class="comment">	been given one chance to be used in malloc.</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line"></span><br><span class="line">      bck = unsorted_chunks(av);</span><br><span class="line">      fwd = bck-&gt;fd;</span><br><span class="line">      <span class="keyword">if</span> (__glibc_unlikely (fwd-&gt;bk != bck))</span><br><span class="line">	&#123;</span><br><span class="line">	  errstr = <span class="string">&quot;free(): corrupted unsorted chunks&quot;</span>;</span><br><span class="line">	  <span class="keyword">goto</span> errout;</span><br><span class="line">	&#125;</span><br><span class="line">      p-&gt;fd = fwd;</span><br><span class="line">      p-&gt;bk = bck;</span><br><span class="line">      <span class="keyword">if</span> (!in_smallbin_range(size))</span><br><span class="line">	&#123;</span><br><span class="line">	  p-&gt;fd_nextsize = <span class="literal">NULL</span>;</span><br><span class="line">	  p-&gt;bk_nextsize = <span class="literal">NULL</span>;</span><br><span class="line">	&#125;</span><br><span class="line">      bck-&gt;fd = p;</span><br><span class="line">      fwd-&gt;bk = p;</span><br><span class="line"></span><br><span class="line">      set_head(p, size | PREV_INUSE);</span><br><span class="line">      set_foot(p, size);</span><br><span class="line"></span><br><span class="line">      check_free_chunk(av, p);</span><br><span class="line">      <span class="comment">// unsorted bin에 해제한 chunk 추가</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">      If the chunk borders the current high end of memory,</span></span><br><span class="line"><span class="comment">      consolidate into top</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">else</span> &#123; <span class="comment">//해제할 chunk 다음 chunk가 top chunk인 경우</span></span><br><span class="line">      size += nextsize;</span><br><span class="line">      set_head(p, size | PREV_INUSE);</span><br><span class="line">      av-&gt;top = p;</span><br><span class="line">      check_chunk(av, p);</span><br><span class="line">      <span class="comment">// topchunk와 병합</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">      If freeing a large space, consolidate possibly-surrounding</span></span><br><span class="line"><span class="comment">      chunks. Then, if the total unused topmost memory exceeds trim</span></span><br><span class="line"><span class="comment">      threshold, ask malloc_trim to reduce top.</span></span><br><span class="line"><span class="comment">      Unless max_fast is 0, we don&#x27;t know if there are fastbins</span></span><br><span class="line"><span class="comment">      bordering top, so we cannot tell for sure whether threshold</span></span><br><span class="line"><span class="comment">      has been reached unless fastbins are consolidated.  But we</span></span><br><span class="line"><span class="comment">      don&#x27;t want to consolidate on each free.  As a compromise,</span></span><br><span class="line"><span class="comment">      consolidation is performed if FASTBIN_CONSOLIDATION_THRESHOLD</span></span><br><span class="line"><span class="comment">      is reached.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((<span class="keyword">unsigned</span> <span class="keyword">long</span>)(size) &gt;= FASTBIN_CONSOLIDATION_THRESHOLD)</span><br><span class="line">    <span class="comment">// size가 FASTBIN 임계값 보다 크고</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> (have_fastchunks(av))</span><br><span class="line">      <span class="comment">// fastbin이 존재하면</span></span><br><span class="line">	malloc_consolidate(av);</span><br><span class="line">    <span class="comment">// fastbin 병합</span></span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (av == &amp;main_arena) </span><br><span class="line">      <span class="comment">// main_arena라면,</span></span><br><span class="line">      &#123;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> MORECORE_CANNOT_TRIM</span></span><br><span class="line">	<span class="keyword">if</span> ((<span class="keyword">unsigned</span> <span class="keyword">long</span>)(chunksize(av-&gt;top)) &gt;=</span><br><span class="line">	    (<span class="keyword">unsigned</span> <span class="keyword">long</span>)(mp_.trim_threshold))</span><br><span class="line">        <span class="comment">// topchunk 크기가 trim 임계값보다 크면</span></span><br><span class="line">	  systrim(mp_.top_pad, av);</span><br><span class="line">      <span class="comment">// systrim 호출</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// main_arena가 아니라면</span></span><br><span class="line">	<span class="comment">/* Always try heap_trim(), even if the top chunk is not</span></span><br><span class="line"><span class="comment">	   large, because the corresponding heap might go away.  */</span></span><br><span class="line">	heap_info *heap = heap_for_ptr(top(av));</span><br><span class="line"></span><br><span class="line">	assert(heap-&gt;ar_ptr == av);</span><br><span class="line">	heap_trim(heap, mp_.top_pad);</span><br><span class="line">    <span class="comment">// heap_trim 호출</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (! have_lock) &#123;</span><br><span class="line">      assert (locked);</span><br><span class="line">      (<span class="keyword">void</span>)mutex_unlock(&amp;av-&gt;mutex);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">/*</span></span><br><span class="line"><span class="comment">    If the chunk was allocated via mmap, release via munmap().</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="comment">// is_mmap flag가 설정되어있으면,</span></span><br><span class="line">    munmap_chunk (p);</span><br><span class="line">    <span class="comment">// munmap_chunk 함수 호출</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>free 함수 호출 순서 : libc_free() -&gt; int_free() -&gt; systrim() or heap_trim() or munmap_chunk()</strong></p>
-<ol>
-<li>libc_free() 함수에서 mmap으로 할당된 메모리인지 확인한 후, 맞을 경우 munmap_chunk() 함수를 통해 메모리 해제</li>
-<li>아닌 경우, 해제하고자 하는 chunk가 속한 Arena의 포인터를 획득한 후, int_free() 함수 호출</li>
-<li>chunk를 해제한 후, 크기에 맞는 bin을 찾아 저장하고 top chunk와 병합을 할 수 있다면 병합 수행</li>
-<li>병합된 top chunk가 너무 커서 Arena의 크기를 넘어선 경우, top chunk의 크기를 줄이기 위해 systrim() 함수 호출</li>
-<li>문제가 없다면, heap_trim() 함수 호출</li>
-<li>mmap으로 할당된 chunk라면 munmap_chunk()를 호출</li>
-</ol>
-<p><img src="https://blog.kakaocdn.net/dn/cM17SL/btqGmQDikKl/ktL2LiuRBLQQukCnPUKyN1/img.png" alt="1"></p>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
-<li><a target="_blank" rel="external nofollow noopener noreferrer" href="https://kimvabel.tistory.com/88">https://kimvabel.tistory.com/88</a></li>
-<li><a target="_blank" rel="external nofollow noopener noreferrer" href="https://tribal1012.tistory.com/141?category=658553">https://tribal1012.tistory.com/141?category=658553</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
@@ -301,10 +212,9 @@
       <meta itemprop="name" content="rvkhunLab">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/02/2020-08-03-malloc_glibc_2_23/" class="post-title-link" itemprop="url">malloc (glibc-2.23)</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          malloc (glibc-2.23)
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -333,6 +243,13 @@
             </span>
 
           
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
 
         </div>
       </header>
@@ -343,7 +260,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ul>
+        <ul>
 <li>glibc-2.23 malloc 분석</li>
 </ul>
 <p><strong>source</strong> : <a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/andigena/glibc-2.23-0ubuntu3/blob/master/malloc/malloc.c">https://github.com/andigena/glibc-2.23-0ubuntu3/blob/master/malloc/malloc.c</a></p>
@@ -383,123 +300,38 @@
 <li><a target="_blank" rel="external nofollow noopener noreferrer" href="https://tribal1012.tistory.com/141?category=658553">https://tribal1012.tistory.com/141?category=658553</a></li>
 </ul>
 
-      
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/tags/malloc/" rel="tag"># malloc</a>
+              <a href="/tags/heap/" rel="tag"># heap</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://pwnkidhn.github.io/2020/06/29/2020-06-30-malloc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/raccoon1.jpg">
-      <meta itemprop="name" content="rvkhun">
-      <meta itemprop="description" content="Security Researcher / CTF Player">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="rvkhunLab">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/06/29/2020-06-30-malloc/" class="post-title-link" itemprop="url">Malloc - glibc(ptmalloc2)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-06-30 00:00:00" itemprop="dateCreated datePublished" datetime="2020-06-30T00:00:00+09:00">2020-06-30</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-10-21 23:07:48" itemprop="dateModified" datetime="2021-10-21T23:07:48+09:00">2021-10-21</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Research/" itemprop="url" rel="index"><span itemprop="name">Research</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="다양한-memory-allocator"><a href="#다양한-memory-allocator" class="headerlink" title="다양한 memory allocator"></a>다양한 memory allocator</h2><p>heap exploit을 구현하기 위해서는 메모리 관리를 위해 사용되는 Allocator에 대한 이해가 필요하다.</p>
-<ul>
-<li>dllmalloc - 일반적인 목적의 할당자</li>
-<li>ptmalloc2 - glibc</li>
-<li>jemalloc - FreeBSD와 Firefox</li>
-<li>tcmalloc - Google(Chrome)</li>
-<li>libumem - Solaris</li>
-</ul>
-<h3 id="ptmalloc2"><a href="#ptmalloc2" class="headerlink" title="ptmalloc2"></a>ptmalloc2</h3><ul>
-<li>ptmalloc2는 리눅스 GLIBC에서 사용하는 메모리 할당자이다.</li>
-<li>운영체제마다 메모리 할당자가 동작하는 방식은 각각 다르며, ptmalloc2는 리눅스 유저 모드에서 주로 사용하는 할당자이다.</li>
-<li>ptmalloc2는 glibc 2.23 버전과 glibc 2.26 ( Tcache )이후 버전 동작 방식이 조금 달라졌다.</li>
-<li>ptmalloc2는 dlmalloc 코드를 기반으로 하며 멀티 스레드에서 사용되도록 확장되었다. </li>
-<li>ptmalloc2는 사용하면 한 번에 두 개 이상의 메모리 영역을 활성화하여 멀티 스레드 어플리케이션을 효율적으로 처리 할 수 있다.</li>
-<li>복수의 스레드가 동시에 malloc을 호출하면 각 스레드는 별도의 힙 세그먼트가 생성되고, 해당 힙을 유지 보수하는 데이터 구조도 분리되어 메모리에 할당된다.</li>
-<li>따라서 서로 다른 스레드가 서로 간섭하지 않고 서로 다른 메모리 영역에 접근 할 수 있다.</li>
-<li>이렇게 각각의 스레드의 유지를 위해 분배된 힙과 freelist data structures의 행동을 per thread arena라고 부른다.</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/06/29/2020-06-30-malloc/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/29/2020-06-30-malloc/" rel="prev" title="Malloc - glibc(ptmalloc2)">
+      <i class="fa fa-chevron-left"></i> Malloc - glibc(ptmalloc2)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/06/2020-08-07-free_glibc_2_23/" rel="next" title="free (glibc-2.23)">
+      free (glibc-2.23) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
       </footer>
+    
   </article>
   
   
   
-
-
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
-  </nav>
 
 
 
@@ -551,6 +383,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#unlink"><span class="nav-number">1.</span> <span class="nav-text">unlink</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#libc-malloc"><span class="nav-number">2.</span> <span class="nav-text">__libc_malloc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#int-malloc"><span class="nav-number">3.</span> <span class="nav-text">_int_malloc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">4.</span> <span class="nav-text">Reference</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
