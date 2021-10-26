@@ -9,16 +9,8 @@
 
 
     <url>
-        <loc>https://pwnkidhn.github.io/2021/10/25/2021-10-26-FuzzingART/</loc>
-        <lastmod>2021-10-25T23:24:13.381Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://pwnkidhn.github.io/2020/08/06/2020-08-07-free_glibc_2_23/</loc>
-        <lastmod>2021-10-21T23:31:34.015Z</lastmod>
+        <lastmod>2021-10-26T08:28:23.501Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -26,7 +18,7 @@
 
     <url>
         <loc>https://pwnkidhn.github.io/2020/08/02/2020-08-03-malloc_glibc_2_23/</loc>
-        <lastmod>2021-10-21T23:31:22.871Z</lastmod>
+        <lastmod>2021-10-26T08:28:12.749Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -34,7 +26,15 @@
 
     <url>
         <loc>https://pwnkidhn.github.io/2020/06/29/2020-06-30-malloc/</loc>
-        <lastmod>2021-10-21T14:07:48.353Z</lastmod>
+        <lastmod>2021-10-26T08:27:59.017Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://pwnkidhn.github.io/2021/10/25/2021-10-26-FuzzingART/</loc>
+        <lastmod>2021-10-25T23:24:13.381Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
