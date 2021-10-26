@@ -755,6 +755,347 @@
       </tags>
   </entry>
   <entry>
+    <title>Fuzzing Art, Science, and Engineering Review</title>
+    <url>/2021/10/25/2021-10-26-FuzzingART/</url>
+    <content><![CDATA[<h2 id="0-용어-정리"><a href="#0-용어-정리" class="headerlink" title="0. 용어 정리"></a>0. 용어 정리</h2><ul>
+<li>최초 Fuzz는 “대상 프로그램에서 사용할 임의의 문자 스트림을 생성하는 것”을 지칭하는 뜻.</li>
+<li>따라서 Fuzzing은 “PUT(Program Under Test)에 Fuzz 된 입력 값을 넣고 실행하는 행위”</li>
+</ul>
+<h3 id="0-1-Fuzzing"><a href="#0-1-Fuzzing" class="headerlink" title="0-1. Fuzzing"></a>0-1. Fuzzing</h3><blockquote>
+<p>Definition 2.1 (Fuzzing).<br>Fuzzing is the execution of PUT using input(s) sampled from an input space (the<br>“fuzz input space”) that protrudes the expected input space of the PUT</p>
+</blockquote>
+<ul>
+<li>퍼징(Fuzzing)은 PUT의 예상 입력 공간을 벗어나는 입력 공간 (이를 “퍼즈 입력 공간”이라 한다)에서 추출한 입력을 사용하여 PUT에 대해 실행하는 것이다.</li>
+<li>즉, 예상되는 데이터 입력을 벗어나는 값을 사용하여 실행하는 행위</li>
+</ul>
+<span id="more"></span>
+
+<h3 id="0-2-Fuzz-Testing"><a href="#0-2-Fuzz-Testing" class="headerlink" title="0-2. Fuzz Testing"></a>0-2. Fuzz Testing</h3><blockquote>
+<p>Definition 2.2 (Fuzz Testing).<br>Fuzz testing is the use of fuzzing where the goal is to test a PUT against a security policy.</p>
+</blockquote>
+<ul>
+<li>퍼즈테스팅은 “대상 프로그램이 보안 정책을 준수하는지 여부를 퍼징을 통해 점검하<br>는 것”으로 정의할 수 있다.</li>
+</ul>
+<h3 id="0-3-Fuzzer"><a href="#0-3-Fuzzer" class="headerlink" title="0-3. Fuzzer"></a>0-3. Fuzzer</h3><blockquote>
+<p>Definition 2.3 (Fuzzer).<br>A fuzzer is a program that performs fuzz testing on a PUT.</p>
+</blockquote>
+<ul>
+<li>퍼저는 대상 프로그램에 퍼즈 테스팅을 수행하는 프로그램이다.</li>
+</ul>
+<h3 id="0-4-Fuzz-Campaign"><a href="#0-4-Fuzz-Campaign" class="headerlink" title="0-4. Fuzz Campaign"></a>0-4. Fuzz Campaign</h3><blockquote>
+<p>Definition 2.4 (Fuzz Campaign).<br>A fuzz campaign is a specific execution of a fuzzer on a PUT with a specific security policy.</p>
+</blockquote>
+<ul>
+<li>퍼즈 캠페인은 특정 보안 정책에 대해 특정 데이터를 넣는 실행이다.<ul>
+<li>요구되는 특정 보안 정책을 위반하는 버그를 찾아 내기 위함이다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="0-5-Bug-Oracle-Crash-Monitor"><a href="#0-5-Bug-Oracle-Crash-Monitor" class="headerlink" title="0-5. Bug Oracle (Crash Monitor)"></a>0-5. Bug Oracle (Crash Monitor)</h3><blockquote>
+<p>Definition 2.5 (Bug Oracle).<br>A bug oracle is a program, perhaps as part of a fuzzer, that determines whether a given execution of the PUT violates a specific security policy.</p>
+</blockquote>
+<ul>
+<li>버그 오라클은 대상 프로그램이 주어진 실행에서 특정 보안 정책을 위반하는지를 판<br>별하는 프로그램으로, 퍼저의 일부분으로 포함되어 있다.</li>
+</ul>
+<h3 id="0-6-Fuzz-Configuration"><a href="#0-6-Fuzz-Configuration" class="headerlink" title="0-6. Fuzz Configuration"></a>0-6. Fuzz Configuration</h3><blockquote>
+<p>Definition 2.6 (Fuzz Configuration).<br>A fuzz configuration of a fuzz algorithm comprises the parameter value(s) that control(s) the fuzz algorithm.</p>
+</blockquote>
+<ul>
+<li>퍼즈 환경설정은 퍼즈 알고리즘을 제어하는 파라미터 값들을 포함한다.</li>
+<li>보통 튜플(Tuple) 형태로 작성된다.</li>
+</ul>
+<h3 id="0-7-Seed-Data"><a href="#0-7-Seed-Data" class="headerlink" title="0-7. Seed Data"></a>0-7. Seed Data</h3><ul>
+<li>Input data를 만들 때 원인이 되는 Seed 파일이다.</li>
+</ul>
+<h3 id="0-8-Seed-Trimming-Crash-Minimization"><a href="#0-8-Seed-Trimming-Crash-Minimization" class="headerlink" title="0-8. Seed Trimming (Crash Minimization)"></a>0-8. Seed Trimming (Crash Minimization)</h3><ul>
+<li>크래쉬가 터졌을 때 그 조건을 만족하는 Input을 최소화 하는 행위이다.</li>
+</ul>
+<h3 id="0-9-Mutation"><a href="#0-9-Mutation" class="headerlink" title="0-9. Mutation"></a>0-9. Mutation</h3><ul>
+<li>Seed data의 값을 변조하는 행위이다.</li>
+</ul>
+<h3 id="0-10-Input-data-Test-Case"><a href="#0-10-Input-data-Test-Case" class="headerlink" title="0-10. Input data (Test Case)"></a>0-10. Input data (Test Case)</h3><ul>
+<li>Mutation을 통해 만들어진 데이터로 Fuzzing의 최초 정의에서 의 Fuzz된 입력 값을 뜻한다.</li>
+</ul>
+<hr>
+<h2 id="1-Fuzz-Testing-Algorithm"><a href="#1-Fuzz-Testing-Algorithm" class="headerlink" title="1. Fuzz Testing Algorithm"></a>1. Fuzz Testing Algorithm</h2><p><img src="https://user-images.githubusercontent.com/49066484/138784004-d7626bb5-5ba4-482f-9a17-61824fb81547.png" alt="Fuzzing%20Art,%20Science,%20and%20Engineering%20c48514ac84f24850b5177761eac9ca66/_.png"></p>
+<ul>
+<li>Input 값으로 퍼즈 환경설정(C)와 타임아웃(t_limit)이 있고, 발견된 버그의 집합 (B)를 Output으로 반환한다.</li>
+<li>전처리 단계 Preprocess 함수 호출 후, 반복문 안에서 Schedule, InputGen, InputEval, ConfUpdate, Continue 함수들이 수행된다.</li>
+<li>각 루프를 수행하는 것을 ‘Fuzz iteration’이라 하고, 하나의 테스트 케이스에 대해 Input Eval이 수행되는 것을 ‘Fuzz run’이라 한다.</li>
+<li>단, 모든 퍼저가 이러한 5개의 함수들을 포함하는 것은 아니다.</li>
+</ul>
+<h3 id="1-1-Preprocess-C-→-C"><a href="#1-1-Preprocess-C-→-C" class="headerlink" title="1-1. Preprocess(C) → C"></a>1-1. Preprocess(C) → C</h3><ul>
+<li>전처리 단계에서는 사용자가 퍼즈 환경설정으로 사용할 값들을 지정하면, 이를 적절히 수정한 상태로 다시 반환하게 된다.</li>
+</ul>
+<h3 id="1-2-Schedule-C-t-elapsed-t-limit-→-conf"><a href="#1-2-Schedule-C-t-elapsed-t-limit-→-conf" class="headerlink" title="1-2. Schedule(C, t_elapsed, t_limit) → conf"></a>1-2. Schedule(C, t_elapsed, t_limit) → conf</h3><ul>
+<li>Schedule 함수는 현재의 퍼즈 환경설정(C) 집합과, 수행 시간 (t_elapsed), 종료 시점(t_limit)을 입력 값으로 하여, 이번 fuzz iteration에서 사용할 특정 설정 값 conf를 지정한다.</li>
+</ul>
+<h3 id="1-3-InputGen-conf-→-tcs"><a href="#1-3-InputGen-conf-→-tcs" class="headerlink" title="1-3. InputGen(conf) → tcs"></a>1-3. InputGen(conf) → tcs</h3><ul>
+<li>InputGen 함수는 퍼즈 환경설정을 토대로 구체적인 테스트 케이스의 집합(tcs)을 생성한다. 테스트 케이스를 생성할 때에는 현재 conf에 설정된 특정 파라미터들을 이용한다. 일부 퍼저는 Seed 방식을 사용하기도 하고, 나머지는 Model 또는 Grammar를 파라미터로 사용하기도 한다.</li>
+</ul>
+<h3 id="1-4-InputEval-conf-tcs-O-bug-→-B’-execinfos"><a href="#1-4-InputEval-conf-tcs-O-bug-→-B’-execinfos" class="headerlink" title="1-4. InputEval(conf, tcs, O_bug) → B’, execinfos"></a>1-4. InputEval(conf, tcs, O_bug) → B’, execinfos</h3><ul>
+<li>InputEval함수는 퍼즈 환경설정과, 테스트 케이스, 그리고 버그 오라클을 입력으로 받는다. 이 단계에서 테스트 케이스를 대상 프로그램에 주입한 후, 해당 실행 과정에서 보안 정책 위반이 발생 하는지를 버그 오라클을 사용하여 점검한다. 이때 버그가 발견되었다면 그 버그 결과와 해당 fuzz run에서 사용된 기타 정보들(execinfos)가 반환 된다. 이때 버그 오라클은 Fuzzer 내부에 포함되어 있다고 가정한다.</li>
+</ul>
+<h3 id="1-5-ConfUpdate-C-conf-execinfos-→-C"><a href="#1-5-ConfUpdate-C-conf-execinfos-→-C" class="headerlink" title="1-5. ConfUpdate(C, conf, execinfos) → C"></a>1-5. ConfUpdate(C, conf, execinfos) → C</h3><ul>
+<li>ConfUpdate 함수는 퍼즈 환경설정(C)과, 현재 설정된 값(conf), 그리고 각각의 fuzz run이 수행될 때의 관련 정보(execinfos)를 입력으로 하여, 퍼즈 환경설정(C)을 업데이트한 값을 결과로 반환한다. 예를 들어 상당수의 그레이 박스 퍼저들은 execinfos의 정보를 기반으로 퍼즈 환경설정(C)의 범위를 축소시킨다.</li>
+</ul>
+<h3 id="1-6-Continue-C-→-True-False"><a href="#1-6-Continue-C-→-True-False" class="headerlink" title="1-6. Continue(C) → {True, False}"></a>1-6. Continue(C) → {True, False}</h3><ul>
+<li>Continue 함수는 퍼즈 환경설정(C)을 기반으로 하여, 다음 fuzz iteration을 수행 여부를 참과 거짓으로 판정하는 Boolean 값을 반환한다.</li>
+</ul>
+<hr>
+<h2 id="2-Fuzzer-분류"><a href="#2-Fuzzer-분류" class="headerlink" title="2. Fuzzer 분류"></a>2. Fuzzer 분류</h2><ul>
+<li>통상적인 소프트웨어 테스팅 분야에서는 크게 두 가지 (Black-box, White-box) 테스트로만 분류되지만, 퍼저는 Black, White, Grey 세 가지로 구분할 수 있다.</li>
+<li>하지만 엄밀히 따지면 Grey-box 퍼징 역시 약간의 정보가 주어지는 상태에서 수행하므로 White-box 퍼징의 한 가지 종류에 속한다고 볼 수도 있다.</li>
+</ul>
+<h3 id="2-1-Black-box-Fuzzer"><a href="#2-1-Black-box-Fuzzer" class="headerlink" title="2-1. Black-box Fuzzer"></a>2-1. Black-box Fuzzer</h3><ul>
+<li>PUT의 내부를 들여다 보지 않는다.</li>
+<li>오직 PUT의 input과 output만을 관찰함으로써 퍼징을 진행한다.</li>
+<li>IO-driven, Data-driven testing 이라고 부르기도 한다.</li>
+<li>ex) SPIKE, BFF, OF, zzuf</li>
+</ul>
+<h3 id="2-2-White-box-Fuzzer"><a href="#2-2-White-box-Fuzzer" class="headerlink" title="2-2. White-box Fuzzer"></a>2-2. White-box Fuzzer</h3><ul>
+<li>PUT의 내부를 알고 있다. (소스코드를 알고있거나, 바이너리 분석이 가능하다.)</li>
+<li>Black-box 방식보다 오버헤드가 크다.</li>
+</ul>
+<h3 id="2-3-Grey-box-Fuzzer"><a href="#2-3-Grey-box-Fuzzer" class="headerlink" title="2-3. Grey-box Fuzzer"></a>2-3. Grey-box Fuzzer</h3><ul>
+<li>White-box와는 달리 PUT의 전체적인 범위를 알 수는 없다.</li>
+<li>PUT에 대한 기본적인 정보만 제공 받는다. (프로토콜 정보..)</li>
+<li>ex) AFL, VUzzer</li>
+</ul>
+<hr>
+<h2 id="3-Preprocess"><a href="#3-Preprocess" class="headerlink" title="3. Preprocess"></a>3. Preprocess</h2><ul>
+<li>어떤 퍼저들은 첫 번째 fuzz iteration을 수행하기 전에 fuzz configuration의 초기 설정을 수정하기도 한다.</li>
+<li>이러한 전처리 작업은 보통 PUT을 Instrumentation, Seed Selection, Seed Trimming 기법을 사용하기 위해서 사용된다.</li>
+</ul>
+<h3 id="3-1-Instrumentation"><a href="#3-1-Instrumentation" class="headerlink" title="3-1. Instrumentation"></a>3-1. Instrumentation</h3><ul>
+<li>input 값에 대한 피드백을 받기 위해서 하는 행위.</li>
+<li>White,Grey-box 퍼저들은 PUT이 fuzz run 된 Evaluation 결과에 대한 정보를 피드백하여 instrument하거나, 실행 중인 메모리 정보들을 이용해 퍼징 할 수 있다.</li>
+<li>Process trace 나 System call trace를 사용하여 PUT 내부의 정보를 얻는 방법도 있지만, instrumentation 기법을 사용하는 이유는 그중 보다 유의미한 정보만을 취득하기 위해 사용한다.</li>
+<li>Static : PUT을 수행하기 전의 상태를 토대로 파악한다. (소스코드가 필요하다.)</li>
+<li>Dynamic : PUT이 수행되는 동안의 정보를 수집한다. (정적보다 오버헤드가 크다.)<ul>
+<li>ex) DynInst, DynamoRIO, Pin, Valgrind, QEMU</li>
+</ul>
+</li>
+<li>Static, Dynamic을 혼합해서 사용할 수 있다.<ul>
+<li>AFL : 특수한 컴파일러 사용 (Static) + QEMU 사용(Dynamic)</li>
+</ul>
+<h3 id="3-1-1-Execution-Feedback"><a href="#3-1-1-Execution-Feedback" class="headerlink" title="3-1-1. Execution Feedback"></a>3-1-1. Execution Feedback</h3><ul>
+<li>퍼저를 실행하면서 피드백을 받아 더욱 유익한 퍼징 실행이 될 수 있도록 하기 위한 방법.</li>
+<li>Grey-box 퍼저는 대부분 execution feedback을 input으로 하여 test case를 발전시킨다.</li>
+</ul>
+<h3 id="3-1-2-In-Memory-Fuzzing"><a href="#3-1-2-In-Memory-Fuzzing" class="headerlink" title="3-1-2. In-Memory Fuzzing"></a>3-1-2. In-Memory Fuzzing</h3><ul>
+<li>큰 바이너리를 퍼징할 때 프로그램을 계속 재시작하는 오버헤드가 발생하는데, 이를 해결하기 위해, 메모리 스냅샷을 떠두고 메모리에서 퍼징을 하고 다시 메모리만 돌리는 방법.</li>
+<li>Crash 발생 시 아까 떠두었던 메모리 스냅샷 이용한다. (처음부터 다시 시작할 필요 없음)</li>
+<li>하지만 똑같은 버그 발생 조건을 갖추어도 버그가 발생하지 않을 수 있다.<ul>
+<li>(=Reproduce가 안 될 수 있음)</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-1-3-Thread-Scheduling"><a href="#3-1-3-Thread-Scheduling" class="headerlink" title="3-1-3. Thread Scheduling"></a>3-1-3. Thread Scheduling</h3><ul>
+<li>Thread 로 동작하는 프로그램의 경우 트리거가 안되는 버그가 존재 할 수 있고, Reproduce가 안될 수 있기 때문에 Thread scheduling을 instrumentation을 통해 명시적으로 해줄 수 있다.</li>
+<li>경우에 따라 Race condition 의 취약점을 더 잘 찾아 주는 효과가 발생한다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-2-Seed-Selection"><a href="#3-2-Seed-Selection" class="headerlink" title="3-2. Seed Selection"></a>3-2. Seed Selection</h3><ul>
+<li>InputData를 만들 때 쓰인다.</li>
+<li>전처리 작업에서 Seed selection이 필요한 이유는 가끔 이 seed가 엄청 많을 경우, 단순히 다양한 seed를 넣어 보는 것이 비 효율적일 수 있기 때문이다.<ul>
+<li>이러한 문제를 seed selection problem 이라고 부른다.</li>
+</ul>
+</li>
+<li>Seed Selection Problem</li>
+<li>Minset Computation : coverage가 동일한 최소의 set을 찾는 것을 목표로한다.<ul>
+<li>(여기서 coverage는 다양한 의미로 쓰인다.)</li>
+<li>ex)  {s1 → {10,20}, s2 → {20,30}}. 대략 s1과 s2만큼 빠르게 실행되는 세 번째 시드 s3 → {10, 20, 30}이있는 경우, s1과 s2 대신 s3을 만드는 것이 더 효과적일 수 있다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-3-Seed-Trimming"><a href="#3-3-Seed-Trimming" class="headerlink" title="3-3. Seed Trimming"></a>3-3. Seed Trimming</h3><ul>
+<li>동일한 목적을 달성하는 여러 개의 Seed를 제거하기 위한 방법론이다.</li>
+<li>Seed의 개수를 줄이는 것과 Seed의 내용을 줄이는 것을 포함한다.</li>
+</ul>
+<h3 id="3-4-Preparing-a-Driver-Application"><a href="#3-4-Preparing-a-Driver-Application" class="headerlink" title="3-4. Preparing a Driver Application"></a>3-4. Preparing a Driver Application</h3><ul>
+<li>PUT을 직접적으로 퍼징 하기가 곤란한 경우, 퍼징을 위한 중간 프로그램을 준비하는 것이다.</li>
+<li>퍼징 대상이 라이브러리인 경우, 해당 라이브러리 내부의 함수를 호출하는 드라이버 프로그램을 만들어서 퍼징한다.</li>
+<li>퍼징 대상이 커널인 경우, userland app을 퍼징함으로써 커널을 퍼징한다.</li>
+<li>퍼징 대상이 IoT인 경우, 스마트 어플리케이션을 드라이버로 하여  IoT장치를 퍼징한다.</li>
+</ul>
+<hr>
+<h2 id="4-Scheduling"><a href="#4-Scheduling" class="headerlink" title="4. Scheduling"></a>4. Scheduling</h2><ul>
+<li>퍼징을 할 때 설정 값을 얼마나 자주 바꿔줄 것 인가에 대한 선택 메커니즘이다.</li>
+<li>목적은 다양한 조건을 피드백 받아 다음 Seed 선택을 용이하게 하기 위함이다.<ul>
+<li>간단한 퍼저 일수록 스케줄링 알고리즘이 필요하지 않다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-1-The-Fuzz-Configuration-Scheduling-FCS-Problem"><a href="#4-1-The-Fuzz-Configuration-Scheduling-FCS-Problem" class="headerlink" title="4-1. The Fuzz Configuration Scheduling (FCS) Problem"></a>4-1. The Fuzz Configuration Scheduling (FCS) Problem</h3><ul>
+<li>근본적으로 모든 스케줄 알고리즘은 exploration과 exploitation이라는 측면에서 상충되는 문<br>제를 겪게 된다.</li>
+<li>exploration : 나중 결정을 위해 보다 정확한 정보를 수집하는데 시간을 할애하는 것.</li>
+<li>exploitation : 현재 가장 유리한 결과물을 얻는데 최선을 다하는 것.</li>
+<li>이러한 문제를 FCS Problem이라 정의한다.</li>
+</ul>
+<h3 id="4-2-Black-box-FCS-Algorithms"><a href="#4-2-Black-box-FCS-Algorithms" class="headerlink" title="4-2. Black-box FCS Algorithms"></a>4-2. Black-box FCS Algorithms</h3><ul>
+<li>블랙박스 퍼징의 상황에서 FCS 알고리즘이 사용할 수 있는 유일한 정보는 특정 configuration을 넣었을 때에 대한 결과값 뿐이다.</li>
+</ul>
+<h3 id="4-3-Grey-box-FCS-Algorithms"><a href="#4-3-Grey-box-FCS-Algorithms" class="headerlink" title="4-3. Grey-box FCS Algorithms"></a>4-3. Grey-box FCS Algorithms</h3><ul>
+<li>블랙박스 보다 많은 정보를 가지고 피드백 받을 수 있다.</li>
+<li>fuzz configuration의 coverage 범위와 같은 정보의 집합을 이용한다.</li>
+<li>각각의 알고리즘은 최대의 효율을 가지기 위해 각자의 알고리즘을 사용하고 있다.<ul>
+<li>시드 적합성, 시드선택, 시드의 유용성 등을 고려.</li>
+<li>좋은 시드들을 군집화 하여 테스팅에 가중치를 줌 (동일한 가중치 일 때는 작은 시드를 선호)</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-4-White-box-FCS-Algorithms"><a href="#4-4-White-box-FCS-Algorithms" class="headerlink" title="4-4. White-box FCS Algorithms"></a>4-4. White-box FCS Algorithms</h3><ul>
+<li>심볼릭 익스큐션 등 굉장히 복잡하다. (논문에서 생략)</li>
+</ul>
+<hr>
+<h2 id="5-Input-Generation"><a href="#5-Input-Generation" class="headerlink" title="5. Input Generation"></a>5. Input Generation</h2><ul>
+<li>테스트 케이스를 통해 전달되는 데이터의 내용이 곧바로 버그를 발생 시키는 지의 여부와 직접적인 연관이 있기 때문에, 어떠한 입력 값을 만들어내는지를 주관하는 기술은 Fuzzer의 가장 핵심적인 설계 요소라고 할 수 있다.</li>
+<li>Generation-based 방식과 Mutation-based 방식으로 나뉜다.</li>
+<li>Generation-based : PUT이 처리할 수 있는 입력 값 데이터에 대한 모델을 주고<br>이를 기반으로 새로운 테스트 케이스를 만들도록 한다. (Model-based)</li>
+<li>Mutation-based : 주어진 Seed를 기반으로 하여 약간의 변이를 주면서 다음 테스트 케이스를 만들도록 한다. (Model-less)</li>
+</ul>
+<h3 id="5-1-Model-based-Generation-based-Fuzzers"><a href="#5-1-Model-based-Generation-based-Fuzzers" class="headerlink" title="5-1. Model-based(Generation-based) Fuzzers"></a>5-1. Model-based(Generation-based) Fuzzers</h3><ul>
+<li>모델 기반 퍼지는 PUT이 수용할 수 있는 입력 또는 실행을 설명하는 주어진 모델을 기반으<br>로 테스트 케이스를 생성한다.</li>
+</ul>
+<h3 id="5-1-1-Predefined-Model"><a href="#5-1-1-Predefined-Model" class="headerlink" title="5-1-1. Predefined Model"></a>5-1-1. Predefined Model</h3><ul>
+<li>사전 정의에 따른 모델은 보통 사용자가 직접 관련된 설정 값을 지정하도록 한다.</li>
+<li>분석가가 EBNF와 같은 문법으로 해당 프로그램의 입력 값 또는 프로토콜의 명세 알맞은 모델링을 수행하여 지정한다.</li>
+</ul>
+<h3 id="5-1-2-Inferred-Model"><a href="#5-1-2-Inferred-Model" class="headerlink" title="5-1-2. Inferred Model"></a>5-1-2. Inferred Model</h3><ul>
+<li>사전 정의된 로직 또는 사용자 제공 모델에 의존하는 것보다는 모델을 스스로 추론하는 것<br>이 최근에 주목을 받고 있다.</li>
+<li>모델 추론은 Preprocess 단계 혹은 ConfUpdate 단계에서 적용될 수 있다.</li>
+</ul>
+<h3 id="5-2-Model-less-Mutation-based-Fuzzers"><a href="#5-2-Model-less-Mutation-based-Fuzzers" class="headerlink" title="5-2. Model-less(Mutation-based) Fuzzers"></a>5-2. Model-less(Mutation-based) Fuzzers</h3><ul>
+<li>PUT의 입력 값을 seed로 하여 그 seed 값을 mutate 하는 방식으로 새로운 테스트 케이스를 만드는 것이 대부분의 Model-less 퍼저들이 수행하는 방식이다.</li>
+<li>이때 seed 들은 PUT에 적용될 수 있도록 구조화가 잘 되어 있는 것이며, 파일, 네트워크 패킷, 일련의 UI 이벤트들이 될 수 있다.</li>
+<li>유효한 파일이 주어지면 그것의 일부분만을 살짝 변경함으로써, 나머지 대부분의 내용은 여전히 유효하지만 일부분의 비정상 값에 의해 PUT의 충돌을 유발하도록 하는 테스트 케이스를 만드는 것을 목표로 한다.</li>
+</ul>
+<h3 id="5-2-1-Bit-Flipping"><a href="#5-2-1-Bit-Flipping" class="headerlink" title="5-2-1. Bit-Flipping"></a>5-2-1. Bit-Flipping</h3><ul>
+<li>고정된 몇 개의 bit를 변경하거나, 그 개수마저 무작위로 변경하는 방식이다.</li>
+<li>mutation ratio를 사용자가 parameter로 지정하도록 하기도 한다.</li>
+</ul>
+<h3 id="5-2-2-Arithmetic-Mutation"><a href="#5-2-2-Arithmetic-Mutation" class="headerlink" title="5-2-2. Arithmetic Mutation"></a>5-2-2. Arithmetic Mutation</h3><ul>
+<li>AFL이나 honggfuzz는 정수의 byte sequence 일부를 찾아서 그 부분을 치환한다.<ul>
+<li>예를 들어 i라는 값을 i ± r로 바꾸는데 이때 r은 0 &lt;= r &lt;35에 해당하도록 한다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-2-3-Block-based-Mutation"><a href="#5-2-3-Block-based-Mutation" class="headerlink" title="5-2-3. Block-based Mutation"></a>5-2-3. Block-based Mutation</h3><ul>
+<li>시드의 byte sequence를 block이라고 정의한다.</li>
+<li>해당 seed에서 무작위적인 위치에 새로운 block을 삽입하거나 기존 block을 일부 삭제하는 등의 방법이다.</li>
+<li>그 외에 블록 내용을 변경하거나 순열의 조합을 변경, 덧붙이기, 짜깁기 등의 변형 또한 가능하다.</li>
+<li>시드를 특정 블럭으로 나눌 수 있는 경우 블럭을 나열하고 거기서 블럭들을 기반으로 삽입, 삭제, 대체 등을 한다.(radamsa)</li>
+</ul>
+<h3 id="5-2-4-Dictionary-based-Mutation"><a href="#5-2-4-Dictionary-based-Mutation" class="headerlink" title="5-2-4. Dictionary-based Mutation"></a>5-2-4. Dictionary-based Mutation</h3><ul>
+<li>실제로 개발자들이 실수를 많이 할 수 있는 산술 연산 오류 포인트를 노린다.</li>
+<li>-1 , 0 , 1 등을 정의해 놓고 이 숫자 값을 우선적으로 대입한다.</li>
+</ul>
+<h3 id="5-3-White-box-Fuzzers"><a href="#5-3-White-box-Fuzzers" class="headerlink" title="5-3. White-box Fuzzers"></a>5-3. White-box Fuzzers</h3><ul>
+<li>White-box 역시 model-based 방법이나 model-less 방법을 적용하는 것이 가능하다.</li>
+<li>보통 dynamic symbolic execution을 통해 테스트 케이스를 만든다.</li>
+</ul>
+<h3 id="5-3-1-Dynamic-Symbolic-Execution"><a href="#5-3-1-Dynamic-Symbolic-Execution" class="headerlink" title="5-3-1. Dynamic Symbolic Execution"></a>5-3-1. Dynamic Symbolic Execution</h3><ul>
+<li>여러가지 방식이 있으나 일반적으로 basic block 단위로 움직인다.</li>
+<li>branch를 만나면 상태 값을 저장하고, fork 시켜 경우의 수를 나누어 모든 경로를 탐색한다.</li>
+<li>BFS, DFS 두가지 방식으로 path를 탐색할 수 있다.</li>
+<li>fully symbolic 은 일반 바이너리에서 어렵다.</li>
+<li>각각의 branch를 통과하기 위한 값을 찾기 위해 일반적으로 SMT solver를 사용한다.</li>
+</ul>
+<h3 id="5-3-2-Guided-Fuzzing"><a href="#5-3-2-Guided-Fuzzing" class="headerlink" title="5-3-2. Guided Fuzzing"></a>5-3-2. Guided Fuzzing</h3><ul>
+<li>퍼징의 확률을 높이기 위해 특정 부분까지 직접 리버싱을 해서 해를 찾아가는 방법이다.</li>
+<li>어느 정도 해를 찾아 퍼징을 할 포인트를 잡아주고 거기서부터 퍼징을 하는 방식이다.<ul>
+<li>ex) TaintScope, Dowser</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-3-3-PUT-Mutation"><a href="#5-3-3-PUT-Mutation" class="headerlink" title="5-3-3. PUT Mutation"></a>5-3-3. PUT Mutation</h3><ul>
+<li>checksum 검사가 있는 경우 모든 데이터가 통과할 수 없기 때문에 바이너리 패치를 통하여 이러한 부분을 무조건 넘기도록 하고 퍼징을 진행한다.</li>
+</ul>
+<hr>
+<h2 id="6-Input-Evaluation"><a href="#6-Input-Evaluation" class="headerlink" title="6. Input Evaluation"></a>6. Input Evaluation</h2><ul>
+<li>퍼징을 수행후에 위반이 일어났는지 안났는지를 판단하기 위한 행위이다.</li>
+<li>단순하게 처리하는 방법도 있지만, 최적화 방법론, 퍼징 효율 등을 고려할 수 있다.</li>
+</ul>
+<h3 id="6-1-Bug-oracle"><a href="#6-1-Bug-oracle" class="headerlink" title="6-1. Bug oracle"></a>6-1. Bug oracle</h3><ul>
+<li>버그 오라클이란 해당 프로그램 수행이 버그를 내포하고 있는지 아닌지를 결정한다.</li>
+<li>sanitizer는 unsafe하거나 unwanted한 프로그램의 동작이 보이는 즉시 강제로 abort를 발생시키는 기법이다.</li>
+</ul>
+<h3 id="6-1-1-Memory-and-Type-safety"><a href="#6-1-1-Memory-and-Type-safety" class="headerlink" title="6-1-1. Memory and Type safety"></a>6-1-1. Memory and Type safety</h3><ul>
+<li>메모리의 유효한 바운더리를 두고 이 경계를 넘는지를 탐지하는 방식.</li>
+<li>Spatial : 특정 객체가 의도하지 않은 대상의 외부에서 포인터 역참조가 발생할 때.<ul>
+<li>Overflow</li>
+</ul>
+</li>
+<li>Temporal : 더 이상 유효하지 않은 포인터에 접근하게 될 때.<ul>
+<li>Use-after-free</li>
+</ul>
+</li>
+</ul>
+<h3 id="6-1-2-Undefined-behaviors"><a href="#6-1-2-Undefined-behaviors" class="headerlink" title="6-1-2. Undefined behaviors"></a>6-1-2. Undefined behaviors</h3><ul>
+<li>컴파일러 최적화 설정, 아키텍처, 컴파일 버전으로 인하여 생기는 예상치 못한 행동.</li>
+</ul>
+<h3 id="6-1-3-Input-validation"><a href="#6-1-3-Input-validation" class="headerlink" title="6-1-3. Input validation"></a>6-1-3. Input validation</h3><ul>
+<li>입력 값 확인.</li>
+<li>XSS나 SQL injection과 같은 취약점들은 모두 주어진 입력 값에 대한 검증을 제대로 수행하지 않았을 때 발생한다.</li>
+</ul>
+<h3 id="6-1-4-Semantic-Difference-differential-testing"><a href="#6-1-4-Semantic-Difference-differential-testing" class="headerlink" title="6-1-4. Semantic Difference (differential testing)"></a>6-1-4. Semantic Difference (differential testing)</h3><ul>
+<li>주어진 두 개 이상의 다른 INPUT으로 출력 간의 차이를 두어 비교 분석한다.</li>
+</ul>
+<h3 id="6-2-Execution-Optimizations"><a href="#6-2-Execution-Optimizations" class="headerlink" title="6-2. Execution Optimizations"></a>6-2. Execution Optimizations</h3><ul>
+<li>반복적인 로딩 프로세스를 건너 뛸 수 있도록 구현하는 것.</li>
+<li>PUT을 매번 프로세스 재 가동 시키게 하는 것은 굉장한 부하를 유발한다.</li>
+</ul>
+<h3 id="6-3-Triage"><a href="#6-3-Triage" class="headerlink" title="6-3. Triage"></a>6-3. Triage</h3><ul>
+<li>보안 정책 위반을 촉발한 해당 테스트 케이스에 대하여 분석하고 리포트하는 작업<br>이다.</li>
+<li>결과의 중복 제거, 우선순위 지정, 테스트 케이스 최소화 작업을 진행한다.</li>
+</ul>
+<h3 id="6-3-1-Deduplication"><a href="#6-3-1-Deduplication" class="headerlink" title="6-3-1. Deduplication"></a>6-3-1. Deduplication</h3><ul>
+<li>동일한 버그를 유발하는 다수의 테스트 케이스를 식별하여 이를 제거하는 것이다.</li>
+<li>각각의 unique bug만을 촉발하는 고유한 test case의 집합만을 남겨두는 것이다.</li>
+<li>분석 시간을 절약 할 수 있으며, 컴퓨터 리소스를 절약 할 수 있다.</li>
+<li>Stack Backtrace hashing : 가장 고전적인 방식으로 backtrace를 통하여 stack 호출 순서를 hasing하여 비교하는 방식, 힙메모리 커럽션에 대한 유니크 크래시를 구분할 수가 없다.</li>
+<li>Coverage-based Deduplication : 크래시가 났을때 동일한 코드에서 터졌는지 확인 하는 방법. (Ex. AFL)</li>
+<li>Semantics-aware Deduplication : core dump의 내용을 분석하고, 어떤 instruction이 bad value를 할당하였는지를 찾아내는 것이다.</li>
+</ul>
+<h3 id="6-3-2-Prioritization-and-Exploitability"><a href="#6-3-2-Prioritization-and-Exploitability" class="headerlink" title="6-3-2. Prioritization and Exploitability"></a>6-3-2. Prioritization and Exploitability</h3><ul>
+<li>unique 한지 보는 것이 아니라 취약점이 악용될 수 있는 지를 판단한다. (Ex. !Exploitable)</li>
+<li>EXPLOITABLE&gt; PROBABLY_EXPLOITABLE&gt; UNKNOWN&gt; NOT_LIKELY_EXPLOITABLE</li>
+<li>결과가 정확하지 않다는 단점이 크다.</li>
+</ul>
+<h3 id="6-3-3-Test-case-minimization"><a href="#6-3-3-Test-case-minimization" class="headerlink" title="6-3-3. Test case minimization"></a>6-3-3. Test case minimization</h3><ul>
+<li>테스트 케이스 중 실제로 보안정책을 위반하게 되는 직접적인 원인 만을 남겨둔 채 기타 부가적인 요소들은 최소화하는 것이다.</li>
+<li>seed trimming과 유사한 개념으로, 입력 값의 사이즈를 줄이려는 시도이다. 테스트 케이스를 최소화 시킴으로써 버그 오라클의 성능을 향상 시킬 수 있다.</li>
+</ul>
+<hr>
+<h2 id="7-Configuration-Update"><a href="#7-Configuration-Update" class="headerlink" title="7. Configuration Update"></a>7. Configuration Update</h2><ul>
+<li>ConfUpdate 단계는 블랙박스 테스팅을 다른 화이트, 그레이 박스 테스팅과 구분 짓는 가장<br>중요한 지표이다.</li>
+<li>블랙박스 퍼저의 경우 프로그램으로부터 어떠한 버그가 발생했는지, 버그 발생에 따라 어떠한 introspection 정보를 얻을 수가 없기 때문에 configuration을 딱히 수정할 수가 없다.</li>
+<li>그레이 박스나 화이트 박스 퍼저들은 보다 정확하게 confupdate를 하도록 구현되어 있다.</li>
+</ul>
+<h3 id="7-1-Evolutionary-Seed-Pool-Update"><a href="#7-1-Evolutionary-Seed-Pool-Update" class="headerlink" title="7-1. Evolutionary Seed Pool Update"></a>7-1. Evolutionary Seed Pool Update</h3><ul>
+<li>Evolutionary Algorithm(EA)는 생물학적 진화 이론에 등장하는 돌연변이, 재조합, 선택설 등의 휴리스틱 기반의 접근법이다.</li>
+<li>퍼징의 맥락에서는 적절한 seed pool을 구성하기 위해 EA를 적용한다.</li>
+<li>대부분 ConfUPdate 단계에서 새로운 conf를 설정 할 때, 노드 혹은 브랜치 coverage를 계산하여 특정 테스트케이스에 의해 새로운 노드나 브랜치가 발견되는지를 찾는 방법을 사용한다.</li>
+</ul>
+<h3 id="7-2-Maintaining-a-Minset"><a href="#7-2-Maintaining-a-Minset" class="headerlink" title="7-2. Maintaining a Minset"></a>7-2. Maintaining a Minset</h3><ul>
+<li>coverage를 최대치로 만족 시키는 test case의 최소 집합만을 구하는 것이다.</li>
+<li>config가 지나치게 많아지는 것을 방지하기 위함이다.</li>
+</ul>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li>Manes, Valentin JM, et al. “Fuzzing: Art, science, and engineering.” arXiv preprint arXiv:1812.00140 (2018).</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Fuzzing</category>
+      </categories>
+      <tags>
+        <tag>fuzzing</tag>
+        <tag>theory</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Malloc - glibc(ptmalloc2)</title>
     <url>/2020/06/29/2020-06-30-malloc/</url>
     <content><![CDATA[<h2 id="다양한-memory-allocator"><a href="#다양한-memory-allocator" class="headerlink" title="다양한 memory allocator"></a>다양한 memory allocator</h2><p>heap exploit을 구현하기 위해서는 메모리 관리를 위해 사용되는 Allocator에 대한 이해가 필요하다.</p>
