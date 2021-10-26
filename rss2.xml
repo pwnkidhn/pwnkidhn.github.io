@@ -9,14 +9,14 @@
     <atom:link href="https://pwnkidhn.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
     
     <description>Security Researcher / CTF Player</description>
-    <pubDate>Tue, 26 Oct 2021 12:43:35 GMT</pubDate>
+    <pubDate>Tue, 26 Oct 2021 21:49:07 GMT</pubDate>
     <generator>http://hexo.io/</generator>
     
     <item>
       <title>VM Escape using CVE-2019-2525/2548 (1)</title>
-      <link>https://pwnkidhn.github.io/2021/10/26/2021-10-27-CVE-2019-2525_2548_1/</link>
-      <guid>https://pwnkidhn.github.io/2021/10/26/2021-10-27-CVE-2019-2525_2548_1/</guid>
-      <pubDate>Tue, 26 Oct 2021 15:00:00 GMT</pubDate>
+      <link>https://pwnkidhn.github.io/2021/10/25/2021-10-26-CVE-2019-2525_2548_1/</link>
+      <guid>https://pwnkidhn.github.io/2021/10/25/2021-10-26-CVE-2019-2525_2548_1/</guid>
+      <pubDate>Mon, 25 Oct 2021 15:00:00 GMT</pubDate>
       
       <description>&lt;ul&gt;
 &lt;li&gt;CVE-2019-2525과 CVE-2019-2548을 이용한 VM exploit.&lt;/li&gt;
@@ -44,7 +44,7 @@
       <category domain="https://pwnkidhn.github.io/tags/VirtualBox/">VirtualBox</category>
       
       
-      <comments>https://pwnkidhn.github.io/2021/10/26/2021-10-27-CVE-2019-2525_2548_1/#disqus_thread</comments>
+      <comments>https://pwnkidhn.github.io/2021/10/25/2021-10-26-CVE-2019-2525_2548_1/#disqus_thread</comments>
       
     </item>
     
