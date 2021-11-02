@@ -20,17 +20,25 @@
     var CONFIG = {"hostname":"pwnkidhn.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Security Researcher &#x2F; CTF Player">
-<meta property="og:type" content="website">
-<meta property="og:title" content="rvkhunLab">
-<meta property="og:url" content="https://pwnkidhn.github.io/archives/2021/03/index.html">
+  <meta name="description" content="자율주행차 서비스  자율주행차 서비스로는 셔틀 및 온-디멘드, 카쉐어링, 주차, 배송, 군집 주행, 어시스턴트, C-ITS 등이 있다. 차량은 V2X 통신을 위하여 셀룰러 통신, WAVE통신 등을 한다. 셔틀 및 온-디멘스, 배송 서비스 등은 차량의 각종 정보를 백엔드 인프라로 전송한다. 군집 주행 및 어시스턴트 서비스는 차량 간 정보를 공유하며 원격 제어">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Automotive Security Model">
+<meta property="og:url" content="https://pwnkidhn.github.io/2021/11/01/2021-11-02-Automotive_service/index.html">
 <meta property="og:site_name" content="rvkhunLab">
-<meta property="og:description" content="Security Researcher &#x2F; CTF Player">
+<meta property="og:description" content="자율주행차 서비스  자율주행차 서비스로는 셔틀 및 온-디멘드, 카쉐어링, 주차, 배송, 군집 주행, 어시스턴트, C-ITS 등이 있다. 차량은 V2X 통신을 위하여 셀룰러 통신, WAVE통신 등을 한다. 셔틀 및 온-디멘스, 배송 서비스 등은 차량의 각종 정보를 백엔드 인프라로 전송한다. 군집 주행 및 어시스턴트 서비스는 차량 간 정보를 공유하며 원격 제어">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/139845220-3a0c063c-590a-4d89-9e16-95e43bdf8a1c.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/139849656-b515d48d-ede2-48ae-b5ab-653bbb622850.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/139851217-951e2cb6-7cb4-49f7-adde-bb94741552cc.png">
+<meta property="article:published_time" content="2021-11-01T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-11-02T13:05:22.337Z">
 <meta property="article:author" content="rvkhun">
+<meta property="article:tag" content="Automotive">
+<meta property="article:tag" content="Car">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/49066484/139845220-3a0c063c-590a-4d89-9e16-95e43bdf8a1c.png">
 
-<link rel="canonical" href="https://pwnkidhn.github.io/archives/2021/03/">
+<link rel="canonical" href="https://pwnkidhn.github.io/2021/11/01/2021-11-02-Automotive_service/">
 
 
 <script id="page-configurations">
@@ -38,12 +46,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'en'
   };
 </script>
 
-  <title>Archive | rvkhunLab</title>
+  <title>Automotive Security Model | rvkhunLab</title>
   <meta name="google-site-verification" content="eBj8hDfb8V5sujjVERa_zAbaTQFLbQzowFQfUz3Rhw8">
   <meta name="naver-site-verification" content="7c18a15cd138e9448d263381fe6201215fc40046">
 
@@ -187,66 +195,170 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <span class="collection-header">Um..! 17 posts in total. Keep on posting.</span>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://pwnkidhn.github.io/2021/11/01/2021-11-02-Automotive_service/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/raccoon1.jpg">
+      <meta itemprop="name" content="rvkhun">
+      <meta itemprop="description" content="Security Researcher / CTF Player">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="rvkhunLab">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Automotive Security Model
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-11-02 00:00:00 / Modified: 22:05:22" itemprop="dateCreated datePublished" datetime="2021-11-02T00:00:00+09:00">2021-11-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Automotive/" itemprop="url" rel="index"><span itemprop="name">Automotive</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
+        <h2 id="자율주행차-서비스"><a href="#자율주행차-서비스" class="headerlink" title="자율주행차 서비스"></a>자율주행차 서비스</h2><p><img src="https://user-images.githubusercontent.com/49066484/139845220-3a0c063c-590a-4d89-9e16-95e43bdf8a1c.png" alt="1"></p>
+<ul>
+<li>자율주행차 서비스로는 셔틀 및 온-디멘드, 카쉐어링, 주차, 배송, 군집 주행, 어시스턴트, C-ITS 등이 있다.</li>
+<li>차량은 V2X 통신을 위하여 셀룰러 통신, WAVE통신 등을 한다.</li>
+<li>셔틀 및 온-디멘스, 배송 서비스 등은 차량의 각종 정보를 백엔드 인프라로 전송한다.</li>
+<li>군집 주행 및 어시스턴트 서비스는 차량 간 정보를 공유하며 원격 제어 등 편의 기능을 제공한다.</li>
+<li>C-ITS 서비스는 주행 중에 필요한 교통 상황과 도로정보를 실시간으로 제공한다.</li>
+<li>자율주행차 서비스 보안 부분으로는 차량 보안, 백엔드 인프라 보안, 통신 채널 보안 등이 있다.</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="자율주행차-서비스-보안-위협"><a href="#자율주행차-서비스-보안-위협" class="headerlink" title="자율주행차 서비스 보안 위협"></a>자율주행차 서비스 보안 위협</h2><p><img src="https://user-images.githubusercontent.com/49066484/139849656-b515d48d-ede2-48ae-b5ab-653bbb622850.png" alt="2"></p>
+<ul>
+<li><p>차량과 벡엔드 인프라가 통신할 때 공격자는 도청 및 데이터 변조를 수행할 수 있고, 백엔드 인프라에 대하여 DoS와 같은 직접적인 공격을 수행할 수 있다.</p>
+</li>
+<li><p>차량에 대해서는 차량 제어기의 인터페이스를 통하여 송수신되는 데이터 또는 저장된 데이터를 도청, 변조하거나 업데이트 패키지를 위변조하여 공격을 수행할 수 있다.</p>
+</li>
+<li><p>차량에 대한 공격</p>
+<ul>
+<li>펌웨어 변조</li>
+<li>차량 원격제어 해킹</li>
+<li>CAN 위변조</li>
+<li>차량 불법 조작</li>
+<li>DoS</li>
+</ul>
+</li>
+<li><p>통신채널에 대한 공격</p>
+<ul>
+<li>통신 도청</li>
+<li>통신 메시지 위변조</li>
+<li>정보 무단 획득</li>
+<li>거짓 정보 제공</li>
+<li>부인</li>
+</ul>
+</li>
+<li><p>백엔드 인프라에 대한 공격</p>
+<ul>
+<li>정보 유출</li>
+<li>권한 상승</li>
+<li>DoS</li>
+</ul>
+</li>
+<li><p>위를 포함한 다양한 어택 벡터가 존재한다.</p>
+</li>
+</ul>
+<h2 id="자율주행차-서비스-보안기술-및-솔루션"><a href="#자율주행차-서비스-보안기술-및-솔루션" class="headerlink" title="자율주행차 서비스 보안기술 및 솔루션"></a>자율주행차 서비스 보안기술 및 솔루션</h2><p><img src="https://user-images.githubusercontent.com/49066484/139851217-951e2cb6-7cb4-49f7-adde-bb94741552cc.png" alt="3"></p>
+<ul>
+<li>보안위협별 대응 보안기술은 아래와 같다.</li>
+<li>차량에 대한 공격 대응 기술<ul>
+<li>펌웨어 변조 : Hardware Security Model, Secure Boot, Secure Debug, Secure Diagnosis …</li>
+<li>차량 원격제어 해킹 : Secure Access, IDS, SecOS …</li>
+<li>CAN 위변조 : IDS, SecOS, Secure Software Update …</li>
+<li>차량 불법 조작 : Secure Access, Secure Diagnosis …</li>
+<li>DoS : IDS</li>
+</ul>
+</li>
+<li>통신채널에 대한 공격 대응 기술<ul>
+<li>통신 도청 : IPSec, TLS/DTLS, WAVE 통신 보안 기술 …</li>
+<li>통신 메시지 위변조 : IPSec, TLS/DTLS, WAVE 통신 보안 기술 …</li>
+<li>정보 무단 획득 : IPSec, TLS/DTLS, WAVE 통신 보안 기술 …</li>
+<li>거짓 정보 제공 : IPSec, TLS/DTLS, WAVE 통신 보안 기술 …</li>
+<li>부인 : IPSec, TLS/DTLS, WAVE 통신 보안 기술 …</li>
+</ul>
+</li>
+<li>백엔드 인프라에 대한 공격 대응 기술<ul>
+<li>정보 유출 : Firewall, DB Encryption, Access Control, Endpoint Detection &amp; Response …</li>
+<li>권한 상승 : Access Control …</li>
+<li>DoS : Firewall …</li>
+</ul>
+</li>
+</ul>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li>https://한국인터넷진흥원.한국/jsp/common/downloadAction.jsp?bno=259&amp;dno=124&amp;fseq=1</li>
+</ul>
+
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+    
+    
+    
 
-      <div class="post-meta">
-        <time itemprop="dateCreated" datetime="2021-03-13T00:00:00+09:00" content="2021-03-13">
-          03-13
-        </time>
-      </div>
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Automotive/" rel="tag"># Automotive</a>
+              <a href="/tags/Car/" rel="tag"># Car</a>
+          </div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/03/12/2021-03-13-UT_CTF_2021/" itemprop="url">
-            <span itemprop="name">2021 UT CTF</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated" datetime="2021-03-07T00:00:00+09:00" content="2021-03-07">
-          03-07
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/03/06/2021-03-07-zer0pts_CTF_2021/" itemprop="url">
-            <span itemprop="name">2021 zer0pts CTF</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
+        
 
 
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/10/27/2021-10-28-CVE-2019-2525_2548_2/" rel="prev" title="VM Escape using CVE-2019-2525/2548 (2)">
+      <i class="fa fa-chevron-left"></i> VM Escape using CVE-2019-2525/2548 (2)
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-  </div>
+      </footer>
+    
+  </article>
   
   
-  
-
   
 
 
@@ -299,6 +411,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%EC%9E%90%EC%9C%A8%EC%A3%BC%ED%96%89%EC%B0%A8-%EC%84%9C%EB%B9%84%EC%8A%A4"><span class="nav-number">1.</span> <span class="nav-text">자율주행차 서비스</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EC%9E%90%EC%9C%A8%EC%A3%BC%ED%96%89%EC%B0%A8-%EC%84%9C%EB%B9%84%EC%8A%A4-%EB%B3%B4%EC%95%88-%EC%9C%84%ED%98%91"><span class="nav-number">2.</span> <span class="nav-text">자율주행차 서비스 보안 위협</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EC%9E%90%EC%9C%A8%EC%A3%BC%ED%96%89%EC%B0%A8-%EC%84%9C%EB%B9%84%EC%8A%A4-%EB%B3%B4%EC%95%88%EA%B8%B0%EC%88%A0-%EB%B0%8F-%EC%86%94%EB%A3%A8%EC%85%98"><span class="nav-number">3.</span> <span class="nav-text">자율주행차 서비스 보안기술 및 솔루션</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">4.</span> <span class="nav-text">Reference</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

