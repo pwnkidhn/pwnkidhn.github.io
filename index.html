@@ -193,6 +193,102 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://pwnkidhn.github.io/2022/02/07/2022-02-16-01_Fuzzing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/raccoon1.jpg">
+      <meta itemprop="name" content="rvkhun">
+      <meta itemprop="description" content="Security Researcher / CTF Player">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="rvkhunLab">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/07/2022-02-16-01_Fuzzing/" class="post-title-link" itemprop="url">The Fuzzing Book_01_Fuzzing: Breaking Things with Random Inputs</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-02-08 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-08T00:00:00+09:00">2022-02-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-02-17 22:44:26" itemprop="dateModified" datetime="2022-02-17T22:44:26+09:00">2022-02-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Fuzzing/" itemprop="url" rel="index"><span itemprop="name">Fuzzing</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.fuzzingbook.org/html/Fuzzer.html">https://www.fuzzingbook.org/html/Fuzzer.html</a></p>
+<p><strong>The essence of fuzzing : Create random inputs, and see if they break things.</strong></p>
+<hr>
+<h1 id="Synopsis"><a href="#Synopsis" class="headerlink" title="Synopsis"></a>Synopsis</h1><h3 id="Fuzzing-아키텍처에-대한-소개"><a href="#Fuzzing-아키텍처에-대한-소개" class="headerlink" title="Fuzzing 아키텍처에 대한 소개"></a>Fuzzing 아키텍처에 대한 소개</h3><ul>
+<li><code>Fuzzer</code> as a base class for fuzzers.</li>
+<li><code>Runner</code> as a base class for programs under test.(PUT)</li>
+</ul>
+<h2 id="Fuzzers"><a href="#Fuzzers" class="headerlink" title="Fuzzers"></a>Fuzzers</h2><p><img src="https://user-images.githubusercontent.com/49066484/154219188-5152c41e-e362-46d6-b6b9-1e68d8b7c39d.png" alt="image"></p>
+<ul>
+<li><p>Fuzzer는 fuzzer들에 대한 기본 클래스로 RandomFuzzer와 같이 확장해서 쓸 쑤 있다.</p>
+</li>
+<li><p>fuzz() 함수는 input을 생성하여 반환한다.</p>
+</li>
+<li><p>run() 함수는 fuzz()에서 생성된 input을 put에 넣어 fuzzing을 실행한다.</p>
+</li>
+<li><p>runs() 함수는 반복적으로 run()을 실행한다.</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/02/07/2022-02-16-01_Fuzzing/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </li></ul></div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://pwnkidhn.github.io/2021/11/01/2021-11-02-Automotive_service/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -965,90 +1061,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://pwnkidhn.github.io/2021/03/06/2021-03-07-zer0pts_CTF_2021/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/raccoon1.jpg">
-      <meta itemprop="name" content="rvkhun">
-      <meta itemprop="description" content="Security Researcher / CTF Player">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="rvkhunLab">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/03/06/2021-03-07-zer0pts_CTF_2021/" class="post-title-link" itemprop="url">2021 zer0pts CTF</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-03-07 00:00:00" itemprop="dateCreated datePublished" datetime="2021-03-07T00:00:00+09:00">2021-03-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-09-26 04:05:41" itemprop="dateModified" datetime="2021-09-26T04:05:41+09:00">2021-09-26</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Write-up/" itemprop="url" rel="index"><span itemprop="name">Write-up</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <center>2021 zer0pts CTF Write-up </center>
-
-
-<h1 id="Not-Beginner’s-Stack-pwnable"><a href="#Not-Beginner’s-Stack-pwnable" class="headerlink" title="Not Beginner’s Stack (pwnable)"></a>Not Beginner’s Stack (pwnable)</h1><h2 id="vulnerability"><a href="#vulnerability" class="headerlink" title="vulnerability"></a>vulnerability</h2><p>Let’s check the protection of the binary.<br><img src="https://user-images.githubusercontent.com/49066484/110238894-62cf5700-7f87-11eb-9635-da4146f6c20e.png" alt="899"><br>You can find that all protection is turned off.</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/03/06/2021-03-07-zer0pts_CTF_2021/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1119,7 +1131,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1170,7 +1182,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

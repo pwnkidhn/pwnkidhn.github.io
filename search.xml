@@ -2110,4 +2110,214 @@
         <tag>linux</tag>
       </tags>
   </entry>
+  <entry>
+    <title>The Fuzzing Book_01_Fuzzing: Breaking Things with Random Inputs</title>
+    <url>/2022/02/07/2022-02-16-01_Fuzzing/</url>
+    <content><![CDATA[<p><a href="https://www.fuzzingbook.org/html/Fuzzer.html">https://www.fuzzingbook.org/html/Fuzzer.html</a></p>
+<p><strong>The essence of fuzzing : Create random inputs, and see if they break things.</strong></p>
+<hr>
+<h1 id="Synopsis"><a href="#Synopsis" class="headerlink" title="Synopsis"></a>Synopsis</h1><h3 id="Fuzzing-아키텍처에-대한-소개"><a href="#Fuzzing-아키텍처에-대한-소개" class="headerlink" title="Fuzzing 아키텍처에 대한 소개"></a>Fuzzing 아키텍처에 대한 소개</h3><ul>
+<li><code>Fuzzer</code> as a base class for fuzzers.</li>
+<li><code>Runner</code> as a base class for programs under test.(PUT)</li>
+</ul>
+<h2 id="Fuzzers"><a href="#Fuzzers" class="headerlink" title="Fuzzers"></a>Fuzzers</h2><p><img src="https://user-images.githubusercontent.com/49066484/154219188-5152c41e-e362-46d6-b6b9-1e68d8b7c39d.png" alt="image"></p>
+<ul>
+<li><p>Fuzzer는 fuzzer들에 대한 기본 클래스로 RandomFuzzer와 같이 확장해서 쓸 쑤 있다.</p>
+</li>
+<li><p>fuzz() 함수는 input을 생성하여 반환한다.</p>
+</li>
+<li><p>run() 함수는 fuzz()에서 생성된 input을 put에 넣어 fuzzing을 실행한다.</p>
+</li>
+<li><p>runs() 함수는 반복적으로 run()을 실행한다.</p>
+<span id="more"></span></li>
+</ul>
+<h2 id="Runners"><a href="#Runners" class="headerlink" title="Runners"></a>Runners</h2><p><img src="https://user-images.githubusercontent.com/49066484/154220275-13711962-4c7d-4b9e-b417-9f033b7463c9.png" alt="image"></p>
+<ul>
+<li>Runner는 Fuzzer에서 생성된 fuzzed string을 input으로 받는다.</li>
+<li>3가지 상태로 결과를 나타낸다. (PASS, FAIL or UNRESOLVED)</li>
+<li>ProgramRunner는 external program을 input으로 주어 fuzzed input과 함께 fuzzing한다.</li>
+<li>PrintRunner는 단순히 입력을 출력하고 PASS결과를 반환한다.</li>
+</ul>
+<hr>
+<h1 id="A-Simple-Fuzzer"><a href="#A-Simple-Fuzzer" class="headerlink" title="A Simple Fuzzer"></a>A Simple Fuzzer</h1><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fuzzer</span>(<span class="params">max_length: <span class="built_in">int</span> = <span class="number">100</span>, char_start: <span class="built_in">int</span> = <span class="number">32</span>, char_range: <span class="built_in">int</span> = <span class="number">32</span></span>) -&gt; <span class="built_in">str</span>:</span></span><br><span class="line">    string_length = random.randrange(<span class="number">0</span>, max_length + <span class="number">1</span>)</span><br><span class="line">    out = <span class="string">&quot;&quot;</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, string_length):</span><br><span class="line">        out += <span class="built_in">chr</span>(random.randrange(char_start, char_start + char_range))</span><br><span class="line">    <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+<ul>
+<li>위와 같이 간단하게 랜덤한 문자열을 만들 수 있다.</li>
+<li>fuzzer(100, ord(‘a’), 26) 와 같이 사용한다면 최대길이 100인 랜덤한 소문자 알파벳 문자열을 생성한다.</li>
+<li>fuzzer(100, ord(‘0’), 10) : 랜덤 숫자 생성</li>
+</ul>
+<h1 id="Fuzzing-External-Programs"><a href="#Fuzzing-External-Programs" class="headerlink" title="Fuzzing External Programs"></a>Fuzzing External Programs</h1><ul>
+<li>퍼징된 입력으로 외부 프로그램 호출을 확인하기 위해 2단계로 진행한다.</li>
+<li>퍼징된 데이터를 입력 파일로 만들고, 이 입력 파일을 선택한 프로그램의 input으로 준다.</li>
+</ul>
+<h2 id="Creating-Input-Files"><a href="#Creating-Input-Files" class="headerlink" title="Creating Input Files"></a>Creating Input Files</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">basename = <span class="string">&quot;input.txt&quot;</span></span><br><span class="line">tempdir = tempfile.mkdtemp()</span><br><span class="line">FILE = os.path.join(tempdir, basename)</span><br><span class="line"><span class="built_in">print</span>(FILE)</span><br><span class="line">data = fuzzer()</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(FILE, <span class="string">&quot;w&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(data)</span><br><span class="line">contents = <span class="built_in">open</span>(FILE).read()</span><br><span class="line"><span class="built_in">print</span>(contents)</span><br><span class="line"><span class="keyword">assert</span>(contents == data)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>임시 파일을 만든 후 fuzzer() 결과를 파일에 쓴다.</li>
+<li>assert를 통해 제대로 동작했는지 확인한다.</li>
+</ul>
+<h2 id="Invoking-External-Programs"><a href="#Invoking-External-Programs" class="headerlink" title="Invoking External Programs"></a>Invoking External Programs</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">program = <span class="string">&quot;bc&quot;</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(FILE, <span class="string">&quot;w&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(<span class="string">&quot;2 + 2\n&quot;</span>)</span><br><span class="line">result = subprocess.run([program, FILE],</span><br><span class="line">                        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, </span><br><span class="line">                        universal_newlines=<span class="literal">True</span>) </span><br></pre></td></tr></table></figure>
+<ul>
+<li>호출할 외부 프로그램은 계산기이며, Input으로 줄 파일에 “2+2”를 쓴다.</li>
+<li>subprocess를 통해 계산기를 Input파일을 주고 실행시킨다.</li>
+<li>result.stdout, result.returncode, result.stderr를 통해 subprocess로 실행시킨 bc의 결과를 알 수 있다.</li>
+</ul>
+<p> <img src="https://user-images.githubusercontent.com/49066484/154255563-694de7e3-76cf-4f57-9cb5-55fbcbeb649c.png" alt="image"></p>
+<ul>
+<li>만약 remove 프로그램에 대해 퍼징을 진행하고, 이때 모든 파일을 다 지울 수 있는 경우가 나올 확률은?<ul>
+<li>무작위로 생성될 문자열의 길이가 1 이면서, 그 값이 / 일 경우 (rm -rf /)</li>
+<li>1/100 * 1/32 가 된다.</li>
+<li>즉 remove 프로그램에 대해 퍼징을 한다면 위의 확률로 모든 파일을 지울 수 있다.</li>
+</ul>
+</li>
+</ul>
+<h2 id="Long-Running-Fuzzing"><a href="#Long-Running-Fuzzing" class="headerlink" title="Long-Running Fuzzing"></a>Long-Running Fuzzing</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">trials = <span class="number">100</span></span><br><span class="line">program = <span class="string">&quot;bc&quot;</span></span><br><span class="line"></span><br><span class="line">runs = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(trials):</span><br><span class="line">    data = fuzzer()</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(FILE, <span class="string">&quot;w&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(data)</span><br><span class="line">    result = subprocess.run([program, FILE],</span><br><span class="line">                            stdin=subprocess.DEVNULL,</span><br><span class="line">                            stdout=subprocess.PIPE,</span><br><span class="line">                            stderr=subprocess.PIPE,</span><br><span class="line">                            universal_newlines=<span class="literal">True</span>)</span><br><span class="line">    runs.append((data, result))</span><br><span class="line">    count = <span class="built_in">sum</span>(<span class="number">1</span> <span class="keyword">for</span>(data,reuslt) <span class="keyword">in</span> runs <span class="keyword">if</span> result.stderr == <span class="string">&quot;&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span> (count)</span><br><span class="line"></span><br><span class="line">    errors = [(data,result) <span class="keyword">for</span> (data,result) <span class="keyword">in</span> runs <span class="keyword">if</span> result.stderr != <span class="string">&quot;&quot;</span>]</span><br><span class="line">    (first_data, first_result) = errors[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">repr</span>(first_data))</span><br><span class="line">    <span class="built_in">print</span>(first_result.stderr)</span><br><span class="line">    </span><br><span class="line">    [result.stderr <span class="keyword">for</span> (data, result) <span class="keyword">in</span> runs <span class="keyword">if</span> result.stderr != <span class="string">&quot;&quot;</span></span><br><span class="line">    <span class="keyword">and</span> <span class="string">&quot;illegal character&quot;</span> <span class="keyword">not</span> <span class="keyword">in</span> result.stderr </span><br><span class="line">    <span class="keyword">and</span> <span class="string">&quot;parse error&quot;</span> <span class="keyword">not</span> <span class="keyword">in</span> result.stderr </span><br><span class="line">    <span class="keyword">and</span> <span class="string">&quot;syntax error&quot;</span> <span class="keyword">not</span> <span class="keyword">in</span> result.stderr]</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+<ul>
+<li>반복문을 통해 여러번 퍼징을 할 수 있다.</li>
+<li>정상적인 호출이 일어난 횟수와 에러가 발생한 횟수를 count할 수 있다.</li>
+<li>발생한 에러중에서 위와 같은 에러가 아니라면 아마도 새로운 종류의 crash일 것이다. </li>
+</ul>
+<h1 id="Bugs-Fuzzers-Find"><a href="#Bugs-Fuzzers-Find" class="headerlink" title="Bugs Fuzzers Find"></a>Bugs Fuzzers Find</h1><h2 id="Buffer-Overflows"><a href="#Buffer-Overflows" class="headerlink" title="Buffer Overflows"></a>Buffer Overflows</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">crash_if_too_long</span>(<span class="params">s</span>):</span></span><br><span class="line">    buffer = <span class="string">&quot;Thursday&quot;</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(s) &gt; <span class="built_in">len</span>(buffer):</span><br><span class="line">        <span class="keyword">raise</span> ValueError</span><br></pre></td></tr></table></figure>
+<ul>
+<li>입력값이 buffer에 있는 문자열 보다 길면 Overflow임을 의미한다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">trials = <span class="number">100</span></span><br><span class="line"><span class="keyword">with</span> ExpectError():</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(trials):</span><br><span class="line">        s = fuzzer()</span><br><span class="line">        crash_if_too_long(s)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>fuzzer()함수로 fuzzed string을 만든 후 crash_if_too_long 함수에 input으로 주어 실행시킨다.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/154408354-96f3222d-f3b6-4eca-8db6-840c42cfb027.png" alt="image"></p>
+<ul>
+<li>여기서 ExpectedError 메시지가 뜨지만, Fuzzing을 통해 UnexpectedError를 발견할 수 있다.</li>
+</ul>
+<h2 id="Missing-Error-Checks"><a href="#Missing-Error-Checks" class="headerlink" title="Missing Error Checks"></a>Missing Error Checks</h2><ul>
+<li>대부분 프로그래밍 언어는 예외처리 대신에 특정한 오류 코드를 사용한다.</li>
+<li>C언어의 getchar()은 더이상 input이 가능하지 않으면 EOF를 반환한다.</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">while</span> (getchar() != <span class="string">&#x27; &#x27;</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>프로그램이 사용자가 공백문자를 이력할 때까지 읽어들이는 상황에서</li>
+<li>입력이 조기에 종료되었다면, getchar()은 계속 EOF을 반환할 것이며,</li>
+<li>이는 무한 루프로 들어가게 된다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hang_if_no_space</span>(<span class="params">s</span>):</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="keyword">if</span> i &lt; <span class="built_in">len</span>(s):</span><br><span class="line">            <span class="keyword">if</span> s[i] == <span class="string">&#x27; &#x27;</span>:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        i += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>공백문자를 입력받으면 break가 된다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">trials = <span class="number">100</span></span><br><span class="line"><span class="keyword">with</span> ExpectTimeout(<span class="number">2</span>):</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(trials):</span><br><span class="line">        s = fuzzer()</span><br><span class="line">        hang_if_no_space(s)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>ExpectTimeout(2)로 지정하고 코드를 돌리면, 2초 뒤에 TImeout Error 메시지가 뜬다.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/154411651-95e1cb25-3e22-49b7-a97d-88eeb5240075.png" alt="image"></p>
+<h2 id="Rogue-Numbers"><a href="#Rogue-Numbers" class="headerlink" title="Rogue Numbers"></a>Rogue Numbers</h2><ul>
+<li>퍼징으로 쉽게 정상적이지 않은 값을 만들 수 있고, 이는 흥미로운 행동을 야기한다. <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">char</span> *<span class="title">read_input</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">size_t</span> size = read_buffer_size();</span><br><span class="line">    <span class="keyword">char</span> *buffer = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(size);</span><br><span class="line">    <span class="comment">// fill buffer</span></span><br><span class="line">    <span class="keyword">return</span> (buffer);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>만약 size가 프로그램 메모리보다 크면 어떻게 될 것인가.</li>
+<li>아니면 size가 문자 수 보다 작으면, 혹은 음수이면 어떻게 될 것인가.</li>
+<li>랜덤으로 생성된 숫자를 생성하여 퍼징은 모든 종류의 에러를 발생시킬 수 있다.<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">collapse_if_too_large</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">int</span>(s) &gt; <span class="number">1000</span>:</span><br><span class="line">        <span class="keyword">raise</span> ValueError</span><br></pre></td></tr></table></figure></li>
+<li>s의 크기가 1000보다 크면 ValueError를 발생한다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">long_number = fuzzer(<span class="number">100</span>, <span class="built_in">ord</span>(<span class="string">&#x27;0&#x27;</span>), <span class="number">10</span>)</span><br><span class="line"><span class="built_in">print</span>(long_number)</span><br><span class="line"><span class="keyword">with</span> ExpectError():</span><br><span class="line">    collapse_if_too_large(long_number)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>fuzzer()함수를 통해 무작위 숫자를 만들고, collapse_if_too_large()함수의 인자로 준다.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/154413271-aed376c9-d47d-48f3-b20d-b266db3f308b.png" alt="image"></p>
+<ul>
+<li>위와 같은 Bug를 찾을 수 있다.</li>
+<li>하지만 누군가는 나쁜 프로그래밍이나, 언어의 문제라고 주장하지만</li>
+<li>매일 수천명의 사람들이 프로그램을 시작하고 같은 실수를 반복한다.</li>
+</ul>
+<h1 id="Catching-Errors"><a href="#Catching-Errors" class="headerlink" title="Catching Errors"></a>Catching Errors</h1><ul>
+<li>처음에 crash와 hang으로 오류를 식별할 수 있었다.</li>
+<li>다만 오류를 감지하기 어렵다면, 우리는 추가적인 확인이 필요하다.</li>
+</ul>
+<h2 id="Generic-Checkers"><a href="#Generic-Checkers" class="headerlink" title="Generic Checkers"></a>Generic Checkers</h2><ul>
+<li>C나 C++같은 언어에서 프로그램은 메모리에 대해 접근할 수 있다.</li>
+<li>취약점이 있다면 초기화 되지 않은 메모리나, 이미 free된 메모리에도 접근할 수 있다.</li>
+<li>런타임에 이러한 문제를 포착하는데 도움이 되는 도구가 있으며 퍼징과 결합하면 좋다.</li>
+</ul>
+<h3 id="Checking-Memory-Acccess"><a href="#Checking-Memory-Acccess" class="headerlink" title="Checking Memory Acccess"></a>Checking Memory Acccess</h3><ul>
+<li>테스트 중에 문제가 있는 메모리 접근을 포착하기 위해, 특별한 메모리 검사 환경에서 C프로그램을 실행할 수 있다.</li>
+<li>Address Sanitizer : memory corruption bug를 감지하는 도구.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;program.c&quot;</span>, <span class="string">&quot;w&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">#include &lt;stdlib.h&gt;</span></span><br><span class="line"><span class="string">#include &lt;string.h&gt;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">int main(int argc, char** argv) &#123;</span></span><br><span class="line"><span class="string">    /* Create an array with 100 bytes, initialized with 42 */</span></span><br><span class="line"><span class="string">    char *buf = malloc(100);</span></span><br><span class="line"><span class="string">    memset(buf, 42, 100);</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    /* Read the N-th element, with N being the first command-line argument */</span></span><br><span class="line"><span class="string">    int index = atoi(argv[1]);</span></span><br><span class="line"><span class="string">    char val = buf[index];</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    /* Clean up memory so we don&#x27;t leak */</span></span><br><span class="line"><span class="string">    free(buf);</span></span><br><span class="line"><span class="string">    return val;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>위와 같이 C코드를 생성하는 스크립트를 작성한다.</li>
+<li>malloc으로 동적 할당을 한 후 42값을 채워준다. </li>
+<li>프로그램 실행 시 인자로 받은 값을 인덱스로 하여 동적할당한 메모리에 접근한다.</li>
+<li>이때 인덱스 값이 메모리를 넘어간다면 OOB 취약점이 발생한다.<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">clang -fsanitize=address -g -o program program.c</span><br></pre></td></tr></table></figure></li>
+<li>컴파일 시 -fsanitize 옵션을 활성화한다.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/154420060-37dcbb4c-d7eb-48bf-a72a-030d8ad6e4f6.png" alt="image"></p>
+<ul>
+<li>할당된 메모리보다 작은 인덱스 값을 주면 정상적으로 출력이 된다.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/154420247-aebacd6f-a07e-41ce-96fc-019ddad5afd4.png" alt="image"></p>
+<ul>
+<li>하지만 할당된 메모리를 초과하는 인덱스 값을 주면 Out of bound 에러가 발생한다.</li>
+<li>Address Sanitizer는 어느 주소에서 취약점이 발생했는지 알려준다.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/154422312-d6b92886-9de9-43d8-a440-75e9c7563464.png" alt="image"></p>
+<ul>
+<li>gdb로 해당 주소를 확인하면 초기화가 된 공간 말고 0x15e 위치를 접근하려 한 것을 확인할 수 있다.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/154420461-819d25c6-123e-40c8-aba3-d76710f3da5b.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/49066484/154420544-74f132d8-b37d-4a17-97b2-84b948519c23.png" alt="image"></p>
+<ul>
+<li>C프로그램에서 오류를 찾고 싶다면, 퍼징과 함께 사용하면 좋다.</li>
+<li>메모리를 더 많이 소모하지만, 버그를 찾는 데 필요한 인간의 노력에 비해 매우 저렴하다.</li>
+<li>Out of bound는 공격자가 의도하지 않은 메모리에 엑세스, 수정이 가능 하기에 보안 위험이 있다.</li>
+<li>대표적인 OOB 취약점으로 HeartBleed가 있다.</li>
+</ul>
+<h3 id="HeartBleed"><a href="#HeartBleed" class="headerlink" title="HeartBleed"></a>HeartBleed</h3><ul>
+<li>OpenSSL 라이브러리의 보안 버그, SSL heartbeat 서비스에서 발견된 취약점</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/154430044-320cd1c6-723b-443e-92b1-de4254777c20.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/49066484/154430311-cd6a27e5-0140-428e-9647-5c1cb11f0bc5.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/49066484/154430675-bb049b9a-c726-42ad-93c1-bb1aa1d06279.png" alt="image"></p>
+<ul>
+<li>OpenSSL에서 이러한 메모리에는 암호화 인증서, 개인 키 등이 포함 될 수 있으며</li>
+<li>메모리에 엑세스한 사실을 아무도 알아채지 못했다.</li>
+<li>하지만 Address Sanitizer로 OpenSSL 라이브러리를 컴파일한 후에</li>
+<li>Out of bound가 발생했음을 알아차렸다.</li>
+</ul>
+<h3 id="Information-Leaks"><a href="#Information-Leaks" class="headerlink" title="Information Leaks"></a>Information Leaks</h3><ul>
+<li>Memory Leak은 illegal한 메모리 접근에 대해서만 발생하는 것이 아닌, 유효한 메모리 내에서도 발생할 수 있다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">secrets = (<span class="string">&quot;&lt;space for reply&gt;&quot;</span> + fuzzer(<span class="number">100</span>) +</span><br><span class="line">           <span class="string">&quot;&lt;secret-certificate&gt;&quot;</span> + fuzzer(<span class="number">100</span>) +</span><br><span class="line">           <span class="string">&quot;&lt;secret-key&gt;&quot;</span> + fuzzer(<span class="number">100</span>) + <span class="string">&quot;&lt;other-secrets&gt;&quot;</span>)</span><br><span class="line">         </span><br><span class="line">uninitialized_memory_marker = <span class="string">&quot;deadbeef&quot;</span></span><br><span class="line"><span class="keyword">while</span> <span class="built_in">len</span>(secrets) &lt; <span class="number">2048</span>:</span><br><span class="line">    secrets += uninitialized_memory_marker</span><br></pre></td></tr></table></figure>
+<ul>
+<li>secrets 문자열을 만든다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">heartbeat</span>(<span class="params">reply: <span class="built_in">str</span>, length: <span class="built_in">int</span>, memory: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span></span><br><span class="line">    <span class="comment"># Store reply in memory</span></span><br><span class="line">    memory = reply + memory[<span class="built_in">len</span>(reply):]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Send back heartbeat</span></span><br><span class="line">    s = <span class="string">&quot;&quot;</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(length):</span><br><span class="line">        s += memory[i]</span><br><span class="line">    <span class="keyword">return</span> s</span><br></pre></td></tr></table></figure>
+<ul>
+<li>heartbeat 기능을 위와 같이 구현한다.<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">heartbeat(<span class="string">&quot;potato&quot;</span>, <span class="number">6</span>, memory=secrets)</span><br><span class="line">heartbeat(<span class="string">&quot;bird&quot;</span>, <span class="number">4</span>, memory=secrets)</span><br><span class="line">heartbeat(<span class="string">&quot;hat&quot;</span>, <span class="number">500</span>, memory=secrets)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/154472897-42298081-e799-480e-b982-93fd7c0b2e84.png" alt="image"></p>
+<ul>
+<li>순서대로 함수를 호출하면 두 번째 인자에 따라 뒤에 출력되는 데이터가 다른 것을 확인할 수 있다.</li>
+<li>어떻게 하면 탐지 할 수 있을까?</li>
+<li>출력하기전에 secret과 uninitialized_memory_marker가 문자열에 있으면 assert.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/154480021-c7a877fd-d4c1-4729-ab69-5b676581fa94.png" alt="image"></p>
+<ul>
+<li>퍼징 중에는 항상 가능한 많은 automatic checker를 켜야 한다. </li>
+<li>오류를 탐지할 수 있는 옵션 없이 프로그램만 실행하면 많은 기회를 놓치기 때문이다.</li>
+</ul>
+<h1 id="A-Fuzzing-Architecture"><a href="#A-Fuzzing-Architecture" class="headerlink" title="A Fuzzing Architecture"></a>A Fuzzing Architecture</h1><h2 id="Runner-Classes"><a href="#Runner-Classes" class="headerlink" title="Runner Classes"></a>Runner Classes</h2><ul>
+<li>Runner는 일반적으로 program or function under test이다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Runner</span>:</span></span><br><span class="line">    PASS = <span class="string">&quot;PASS&quot;</span></span><br><span class="line">    FAIL = <span class="string">&quot;FAIL&quot;</span></span><br><span class="line">    UNRESOLVED = <span class="string">&quot;UNRESOLVED&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>) -&gt; <span class="literal">None</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self, inp: <span class="built_in">str</span></span>) -&gt; <span class="type">Any</span>:</span></span><br><span class="line">        <span class="keyword">return</span> (inp, Runner.UNRESOLVED)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PrintRunner</span>(<span class="params">Runner</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self, inp</span>) -&gt; <span class="type">Any</span>:</span></span><br><span class="line">        <span class="built_in">print</span>(inp)</span><br><span class="line">        <span class="keyword">return</span> (inp, Runner.UNRESOLVED)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProgramRunner</span>(<span class="params">Runner</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, program: <span class="type">Union</span>[<span class="built_in">str</span>, <span class="type">List</span>[<span class="built_in">str</span>]]</span>) -&gt; <span class="literal">None</span>:</span></span><br><span class="line">        self.program = program</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run_process</span>(<span class="params">self, inp: <span class="built_in">str</span> = <span class="string">&quot;&quot;</span></span>) -&gt; subprocess.CompletedProcess:</span></span><br><span class="line">        <span class="keyword">return</span> subprocess.run(self.program, <span class="built_in">input</span>=inp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self, inp: <span class="built_in">str</span> = <span class="string">&quot;&quot;</span></span>) -&gt; <span class="type">Tuple</span>[subprocess.CompletedProcess, Outcome]:</span></span><br><span class="line">        result = self.run_process(inp)</span><br><span class="line">        <span class="keyword">if</span> result.returncode == <span class="number">0</span>:</span><br><span class="line">            outcome = self.PASS</span><br><span class="line">        <span class="keyword">elif</span> result.returncode &lt; <span class="number">0</span>:</span><br><span class="line">            outcome = self.FAIL</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            outcome = self.UNRESOLVED</span><br><span class="line">        <span class="keyword">return</span> (result,outcome)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BinaryProgramRunner</span>(<span class="params">ProgramRunner</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run_process</span>(<span class="params">self, inp: <span class="built_in">str</span>=<span class="string">&quot;&quot;</span></span>) -&gt; subprocess.CompletedProcess:</span></span><br><span class="line">        <span class="keyword">return</span> subprocess.run(self.program,<span class="built_in">input</span>=inp.encode(),stdout=subprocess.PIPE, stderr=subprocess.PIPE)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Fuzzer-Classes"><a href="#Fuzzer-Classes" class="headerlink" title="Fuzzer Classes"></a>Fuzzer Classes</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Fuzzer</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>) -&gt; <span class="literal">None</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">fuzz</span>(<span class="params">self</span>) -&gt; <span class="built_in">str</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self, runner: Runner = Runner(<span class="params"></span>)</span>) -&gt; <span class="type">Tuple</span>[subprocess.CompletedProcess, Outcome]:</span></span><br><span class="line">        <span class="keyword">return</span> runner.run(self.fuzz())</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">runs</span>(<span class="params">self, runner: Runner = PrintRunner(<span class="params"></span>), trials: <span class="built_in">int</span> = <span class="number">10</span></span>) -&gt; <span class="type">List</span>[<span class="type">Tuple</span>[subprocess.CompletedProcess, Outcome]]:</span></span><br><span class="line">        outcomes = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(trials):</span><br><span class="line">            outcomes.append(self.run(runner))</span><br><span class="line">        <span class="keyword">return</span> outcomes</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RandomFuzzer</span>(<span class="params">Fuzzer</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, min_length: <span class="built_in">int</span> = <span class="number">10</span>, max_length: <span class="built_in">int</span> = <span class="number">100</span>, char_start: <span class="built_in">int</span> = <span class="number">32</span>, char_range: <span class="built_in">int</span> = <span class="number">32</span></span>) -&gt; <span class="literal">None</span>:</span></span><br><span class="line">        self.min_length = min_length</span><br><span class="line">        self.max_length = max_length</span><br><span class="line">        self.char_start = char_start</span><br><span class="line">        self.char_range = char_range</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">fuzz</span>(<span class="params">self</span>) -&gt; <span class="built_in">str</span>:</span></span><br><span class="line">        string_length = random.randrange(self.min_length, self.max_length + <span class="number">1</span>)</span><br><span class="line">        out = <span class="string">&quot;&quot;</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, string_length):</span><br><span class="line">            out += <span class="built_in">chr</span>(random.randrange(self.char_start,self.char_start + self.char_range))</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>Fuzzing</category>
+      </categories>
+      <tags>
+        <tag>fuzzing</tag>
+        <tag>theory</tag>
+      </tags>
+  </entry>
 </search>
