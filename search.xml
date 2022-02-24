@@ -2320,4 +2320,179 @@
         <tag>theory</tag>
       </tags>
   </entry>
+  <entry>
+    <title>The Fuzzing Book_02_Coverage</title>
+    <url>/2022/02/21/2022-02-23-02_Coverage/</url>
+    <content><![CDATA[<p><a href="https://www.fuzzingbook.org/html/Coverage.html">https://www.fuzzingbook.org/html/Coverage.html</a></p>
+<ul>
+<li>Coverage란, 소프트웨어 테스팅을 하는데 사용되는 지표 중 하나로, Code가 얼마나 실행되었느냐를 측정한다.</li>
+<li>Coverage를 측정하기 위해 instrumentation을 한다.</li>
+<li>instrumentation은 작성된 코드가 실행되는 지를 확인하는 코드를 작성된 코드 사이사이에 삽입하는 것을 뜻한다.</li>
+</ul>
+<ol>
+<li>Function coverage : 함수가 최소한 한 번 실행되었는 가를 측정한다. function call을 했는지만을 확인하기 때문에 해당 function안의 모든 코드가 실행되었는 지는 확인할 수 없다.</li>
+</ol>
+<ol start="2">
+<li>Statement coverage : 각 statement가 실행 되었는지를 측정한다. <ul>
+<li>장점 : object code에 바로 적용 될 수 있다.</li>
+<li>단점 : 특정 조건분기문에서 에러를 찾아내지 못할 가능성이 있다.<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"><span class="keyword">if</span>(condition)</span><br><span class="line">   p = &amp;a;</span><br><span class="line">*p = <span class="number">123</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>condition이 false라면 null pointer error가 발생한다. 이때 coverage가 달성되었다고 하겠지만, 모든 경우를 test했다고 보장 할 수 없다.</li>
+</ul>
+<span id="more"></span> 
+<ol start="3">
+<li>Brach coverage : 각 조건 분기문이 참/거짓으로 모두 실행되었는 지를 측정한다. <ul>
+<li>장점 : Statement coverage가 가지고 있는 단점을 보완한다.</li>
+<li>단점 : 조건문 전체를 확인해보지 않기 때문에 에러를 찾아내지 못할 가능성이 있다.<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(condition1 &amp;&amp; (condition2 || function()))</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>condition2가 참이되는 순간 function()을 실행하지 않기 때문에 function()함수가 test되지 않는 경우가 발생한다.</li>
+</ul>
+<ol start="4">
+<li>Condition coverage : 조건 분기문에 있는 모든 expression들의 참/거짓을 측정한다.<ul>
+<li>장점 : Branch coverage의 단점을 보완한다.<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(condition1 || condition2 &amp;&amp; condition3) </span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>condition1, condition2, condition3가 각각 모두 참/거짓인 경우를 확인한다.</li>
+</ul>
+<ol start="5">
+<li>Path coverage : 각 function에서 가능한 모든 Path를 실행해봤는지를 확인한다.</li>
+</ol>
+<ul>
+<li>path란 함수의 시작부터 끝까지 존재하는 연속된 branch들을 뜻한다.</li>
+<li>각 path는 unique하다.<ul>
+<li>장점 : 엄밀한 테스팅이 가능하다.</li>
+<li>단점 : Path의 수가 매우 많다.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="Synopsis"><a href="#Synopsis" class="headerlink" title="Synopsis"></a>Synopsis</h1><ul>
+<li>coverage 정보를 uncoverd locations로 fuzzing을 유도할 수 있다. (guided fuzzing)</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/155260541-41185ffc-7dd4-42c7-b9db-a71280d14946.png" alt="image"></p>
+<hr>
+<h1 id="A-CGI-Decoder"><a href="#A-CGI-Decoder" class="headerlink" title="A CGI Decoder"></a>A CGI Decoder</h1><ul>
+<li>CGI encoding은 URL에서 사용된다.</li>
+<li>공백은 ‘+’로, invaild한 문자는  ‘%xx’ 로 바뀐다. (xx는 두자리 hex)</li>
+<li> “Hello, world!”  -&gt;  “Hello%2c+world%21”</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cgi_decode</span>(<span class="params">s: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;Decode the CGI-encoded string `s`:</span></span><br><span class="line"><span class="string">       * replace &#x27;+&#x27; by &#x27; &#x27;</span></span><br><span class="line"><span class="string">       * replace &quot;%xx&quot; by the character with hex number xx.</span></span><br><span class="line"><span class="string">       Return the decoded string.  Raise `ValueError` for invalid inputs.&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Mapping of hex digits to their integer values</span></span><br><span class="line">    hex_values = &#123;</span><br><span class="line">        <span class="string">&#x27;0&#x27;</span>: <span class="number">0</span>, <span class="string">&#x27;1&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;2&#x27;</span>: <span class="number">2</span>, <span class="string">&#x27;3&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;4&#x27;</span>: <span class="number">4</span>,</span><br><span class="line">        <span class="string">&#x27;5&#x27;</span>: <span class="number">5</span>, <span class="string">&#x27;6&#x27;</span>: <span class="number">6</span>, <span class="string">&#x27;7&#x27;</span>: <span class="number">7</span>, <span class="string">&#x27;8&#x27;</span>: <span class="number">8</span>, <span class="string">&#x27;9&#x27;</span>: <span class="number">9</span>,</span><br><span class="line">        <span class="string">&#x27;a&#x27;</span>: <span class="number">10</span>, <span class="string">&#x27;b&#x27;</span>: <span class="number">11</span>, <span class="string">&#x27;c&#x27;</span>: <span class="number">12</span>, <span class="string">&#x27;d&#x27;</span>: <span class="number">13</span>, <span class="string">&#x27;e&#x27;</span>: <span class="number">14</span>, <span class="string">&#x27;f&#x27;</span>: <span class="number">15</span>,</span><br><span class="line">        <span class="string">&#x27;A&#x27;</span>: <span class="number">10</span>, <span class="string">&#x27;B&#x27;</span>: <span class="number">11</span>, <span class="string">&#x27;C&#x27;</span>: <span class="number">12</span>, <span class="string">&#x27;D&#x27;</span>: <span class="number">13</span>, <span class="string">&#x27;E&#x27;</span>: <span class="number">14</span>, <span class="string">&#x27;F&#x27;</span>: <span class="number">15</span>,</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    t = <span class="string">&quot;&quot;</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> i &lt; <span class="built_in">len</span>(s):</span><br><span class="line">        c = s[i]</span><br><span class="line">        <span class="keyword">if</span> c == <span class="string">&#x27;+&#x27;</span>:</span><br><span class="line">            t += <span class="string">&#x27; &#x27;</span></span><br><span class="line">        <span class="keyword">elif</span> c == <span class="string">&#x27;%&#x27;</span>:</span><br><span class="line">            digit_high, digit_low = s[i + <span class="number">1</span>], s[i + <span class="number">2</span>]</span><br><span class="line">            i += <span class="number">2</span></span><br><span class="line">            <span class="keyword">if</span> digit_high <span class="keyword">in</span> hex_values <span class="keyword">and</span> digit_low <span class="keyword">in</span> hex_values:</span><br><span class="line">                v = hex_values[digit_high] * <span class="number">16</span> + hex_values[digit_low]</span><br><span class="line">                t += <span class="built_in">chr</span>(v)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">raise</span> ValueError(<span class="string">&quot;Invalid encoding&quot;</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            t += c</span><br><span class="line">        i += <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> t</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cgi_decode함수를 체계적으로 테스트 하고싶다면 두 가지 방법이 있다.</li>
+<li>BlackBox testing과 WhiteBox testing</li>
+</ul>
+<h1 id="Black-Box-Testing"><a href="#Black-Box-Testing" class="headerlink" title="Black-Box Testing"></a>Black-Box Testing</h1><ul>
+<li>블랙박스 테스트는 specification으로부터 테스트를 도출하는 것이다.</li>
+<li>내부 구조나 동작 원리를 모르는 상태에서 소프트웨어의 동작을 검사하는 것.<ul>
+<li>testing for correct replacement of ‘+’;</li>
+<li>testing for correct replacement of “%xx”;</li>
+<li>testing for non-replacement of other characters; and</li>
+<li>testing for recognition of illegal inputs.</li>
+</ul>
+</li>
+</ul>
+<h1 id="White-Box-Testing"><a href="#White-Box-Testing" class="headerlink" title="White-Box Testing"></a>White-Box Testing</h1><ul>
+<li>화이트박스 테스트는 내부 구조를 가지고 테스트를 도출하는 것이다.</li>
+<li>코드의 구조적 특징을 다루는 개념과 밀접한 관련이 있다.<ul>
+<li>The block following if c == ‘+’</li>
+<li>The two blocks following if c == ‘%’ (one for valid input, one for invalid)</li>
+<li>The final else case for all other characters.</li>
+</ul>
+</li>
+</ul>
+<h1 id="Tracing-Executions"><a href="#Tracing-Executions" class="headerlink" title="Tracing Executions"></a>Tracing Executions</h1><ul>
+<li>파이썬에서는 함수 sys.settrace()를 사용하면 추적이 가능하다.</li>
+<li>모든 라인에 대해 호출되는 추적함수 f를 정의하고 sys.settrace(f)를 호출하면 된다.</li>
+<li>추적함수에는 3가지 매개변수가 있다. (frame, event, arg)<ul>
+<li>frame 매개변수는 현재 frame을 가져와 현재 위치와 변수에 접근할 수 있다.<ul>
+<li>frame.f_code는 현재 프레임과 함께 생성되는 코드이다.</li>
+<li>frame.f_code.co_name은 함수 이름이다.</li>
+<li>frame.f_lineno는 현재 라인 번호이다.</li>
+<li>frame.f_locals는 지역 변수와 인자값 이다.</li>
+</ul>
+</li>
+<li>event 매개변수는 문자열이 들어간다.<ul>
+<li>“line”이면, 호출된 새로운 line,</li>
+<li>“call”이면, 호출된 함수</li>
+</ul>
+</li>
+<li>agr 매개변수는 어떠한 event에 대한 추가적인 인자이다.<ul>
+<li>“return”이벤트일대 arg는 리턴 값을 포함한다.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">traceit</span>(<span class="params">frame: FrameType, event: <span class="built_in">str</span>, arg: <span class="type">Any</span></span>) -&gt; <span class="type">Optional</span>[<span class="type">Callable</span>]:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;Trace program execution. To be passed to sys.settrace().&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> event == <span class="string">&#x27;line&#x27;</span>:</span><br><span class="line">        <span class="keyword">global</span> coverage</span><br><span class="line">        function_name = frame.f_code.co_name</span><br><span class="line">        lineno = frame.f_lineno</span><br><span class="line">        coverage.append(lineno)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> traceit</span><br></pre></td></tr></table></figure>
+<ul>
+<li>추적함수 traceit을 선언해준다. 새로운 line이 호출되면, 호출된 lineno을 coverage 전역변수에 추가해주는 함수이다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cgi_decode_traced</span>(<span class="params">s: <span class="built_in">str</span></span>) -&gt; <span class="literal">None</span>:</span></span><br><span class="line">    <span class="keyword">global</span> coverage</span><br><span class="line">    coverage = []</span><br><span class="line">    sys.settrace(traceit)  <span class="comment"># Turn on</span></span><br><span class="line">    cgi_decode(s)</span><br><span class="line">    sys.settrace(<span class="literal">None</span>)    <span class="comment"># Turn off</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>sys.settrace()함수로 추적함수를 실행 시킨 후, 추적할 함수 cgi_decode()를 호출한다.</li>
+<li>그 후 sys.settrace(none)함수로 추적을 종료한다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> lineno <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="built_in">len</span>(cgi_decode_lines)):</span><br><span class="line">    <span class="keyword">if</span> (function_name, lineno) <span class="keyword">in</span> self.trace():</span><br><span class="line">    	t += <span class="string">&quot;# &quot;</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">    	t += <span class="string">&quot;  &quot;</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;%2d  &quot;</span> % lineno, end=<span class="string">&quot;&quot;</span>)</span><br><span class="line">    print_content(cgi_decode_lines[lineno], <span class="string">&#x27;.py&#x27;</span>)</span><br><span class="line">    <span class="built_in">print</span>()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>추가적으로 위의 코드를 실행시키면,  커버되지 않은 line과 커버된 line에 표시를 할 수 있다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> Coverage() <span class="keyword">as</span> cov:</span><br><span class="line">    cgi_decode(<span class="string">&quot;a+b&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(cov)</span><br></pre></td></tr></table></figure>
+<p><img src="https://user-images.githubusercontent.com/49066484/155457176-7759f4a3-c654-4d94-9f7d-892c89e433d7.png" alt="image"></p>
+<ul>
+<li>“a+b”를 주었을 때 if c==”+” block을 커버하고, elif문을 커버하지 않는 것을 확인할 수 있다.</li>
+</ul>
+<h1 id="A-Coverage-Class"><a href="#A-Coverage-Class" class="headerlink" title="A Coverage Class"></a>A Coverage Class</h1><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> OBJECT [<span class="keyword">as</span> VARIABLE]:</span><br><span class="line">    BODY</span><br></pre></td></tr></table></figure>
+<ul>
+<li>파이썬으로 커버리지를 측정할때 일반적인 형식은  OBJECT가 정의되고 BODY가 실행되는데, </li>
+<li>이때 OBJECT.<strong>enter</strong>()과, OBJECT.<strong>exit</strong>()가 자동으로 호출된다.</li>
+<li>Coverage.<strong>enter</strong>()은 자동으로 추적을 시작하고.</li>
+<li>Coverage.<strong>exit</strong>()은 추적을 종료한다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> Coverage() <span class="keyword">as</span> cov:</span><br><span class="line">    function_to_be_traced()</span><br><span class="line">c = cov.coverage()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>function_to_be_traced()가 진행될 동안 추적을 시작하고, with block 다음에 다시 꺼진다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">Location = <span class="type">Tuple</span>[<span class="built_in">str</span>, <span class="built_in">int</span>]</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Coverage</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>) -&gt; <span class="literal">None</span>:</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span></span><br><span class="line">        self._trace: <span class="type">List</span>[Location] = []</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Trace function</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">traceit</span>(<span class="params">self, frame: FrameType, event: <span class="built_in">str</span>, arg: <span class="type">Any</span></span>) -&gt; <span class="type">Optional</span>[<span class="type">Callable</span>]:</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;Tracing function. To be overloaded in subclasses.&quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">if</span> self.original_trace_function <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            self.original_trace_function(frame, event, arg)</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">if</span> event == <span class="string">&quot;line&quot;</span>:</span><br><span class="line">            function_name = frame.f_code.co_name</span><br><span class="line">            lineno = frame.f_lineno</span><br><span class="line">            <span class="keyword">if</span> function_name != <span class="string">&#x27;__exit__&#x27;</span>:  <span class="comment"># avoid tracing ourselves:</span></span><br><span class="line">                self._trace.append((function_name, lineno))</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">return</span> self.traceit</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__enter__</span>(<span class="params">self</span>) -&gt; <span class="type">Any</span>:</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;Start of `with` block. Turn on tracing.&quot;&quot;&quot;</span></span><br><span class="line">        self.original_trace_function = sys.gettrace()</span><br><span class="line">        sys.settrace(self.traceit)</span><br><span class="line">        <span class="keyword">return</span> self</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__exit__</span>(<span class="params">self, exc_type: <span class="type">Type</span>, exc_value: BaseException, </span></span></span><br><span class="line"><span class="params"><span class="function">                 tb: TracebackType</span>) -&gt; <span class="type">Optional</span>[<span class="built_in">bool</span>]:</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;End of `with` block. Turn off tracing.&quot;&quot;&quot;</span></span><br><span class="line">        sys.settrace(self.original_trace_function)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span>  <span class="comment"># default: pass all exceptions</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">trace</span>(<span class="params">self</span>) -&gt; <span class="type">List</span>[Location]:</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;The list of executed lines, as (function_name, line_number) pairs&quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">return</span> self._trace</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">coverage</span>(<span class="params">self</span>) -&gt; <span class="type">Set</span>[Location]:</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;The set of executed lines, as (function_name, line_number) pairs&quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">set</span>(self.trace())</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">function_names</span>(<span class="params">self</span>) -&gt; <span class="type">Set</span>[<span class="built_in">str</span>]:</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;The set of function names seen&quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">set</span>(function_name <span class="keyword">for</span> (function_name, line_number) <span class="keyword">in</span> self.coverage())</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>) -&gt; <span class="built_in">str</span>:</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;Return a string representation of this object.</span></span><br><span class="line"><span class="string">           Show covered (and uncovered) program code&quot;&quot;&quot;</span></span><br><span class="line">        t = <span class="string">&quot;&quot;</span></span><br><span class="line">        <span class="keyword">for</span> function_name <span class="keyword">in</span> self.function_names():</span><br><span class="line">            <span class="comment"># Similar code as in the example above</span></span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                fun = <span class="built_in">eval</span>(function_name)</span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> exc:</span><br><span class="line">                t += <span class="string">f&quot;Skipping <span class="subst">&#123;function_name&#125;</span>: <span class="subst">&#123;exc&#125;</span>&quot;</span></span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">    </span><br><span class="line">            source_lines, start_line_number = inspect.getsourcelines(fun)</span><br><span class="line">            <span class="keyword">for</span> lineno <span class="keyword">in</span> <span class="built_in">range</span>(start_line_number, start_line_number + <span class="built_in">len</span>(source_lines)):</span><br><span class="line">                <span class="keyword">if</span> (function_name, lineno) <span class="keyword">in</span> self.trace():</span><br><span class="line">                    t += <span class="string">&quot;# &quot;</span></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    t += <span class="string">&quot;  &quot;</span></span><br><span class="line">                t += <span class="string">&quot;%2d  &quot;</span> % lineno</span><br><span class="line">                t += source_lines[lineno - start_line_number]</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">return</span> t</span><br></pre></td></tr></table></figure>
+
+<h1 id="Coverage-of-Basic-Fuzzing"><a href="#Coverage-of-Basic-Fuzzing" class="headerlink" title="Coverage of Basic Fuzzing"></a>Coverage of Basic Fuzzing</h1><ul>
+<li>cgi_decode() 함수를 랜덤 퍼징으로 최고의 커버리지에 도달하는 것을 목표로 한다.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> Coverage() <span class="keyword">as</span> cov_fuzz:</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        cgi_decode(sample)</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">cov_fuzz.coverage()</span><br></pre></td></tr></table></figure>
+<p><img src="https://user-images.githubusercontent.com/49066484/155460763-8e12757e-25a1-48a6-acfa-88352f0f7c17.png" alt="image"></p>
+<ul>
+<li>maximum 커버리지라고 생각 될 수있지만, max 커버리지와 비교했을 때 여전히 몇 개의 라인을 놓친것을 확인 할 수 있다.</li>
+</ul>
+<h1 id="Getting-Coverage-from-External-Programs"><a href="#Getting-Coverage-from-External-Programs" class="headerlink" title="Getting Coverage from External Programs"></a>Getting Coverage from External Programs</h1><ul>
+<li>거의 모든 프로그래밍 언어는 커버리지를 측정할 수 있는 기능이 있다.</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> hex_values[<span class="number">256</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init_hex_values</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">sizeof</span>(hex_values) / <span class="keyword">sizeof</span>(<span class="keyword">int</span>); i++) &#123;</span><br><span class="line">        hex_values[i] = <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    hex_values[<span class="string">&#x27;0&#x27;</span>] = <span class="number">0</span>; hex_values[<span class="string">&#x27;1&#x27;</span>] = <span class="number">1</span>; hex_values[<span class="string">&#x27;2&#x27;</span>] = <span class="number">2</span>; hex_values[<span class="string">&#x27;3&#x27;</span>] = <span class="number">3</span>;</span><br><span class="line">    hex_values[<span class="string">&#x27;4&#x27;</span>] = <span class="number">4</span>; hex_values[<span class="string">&#x27;5&#x27;</span>] = <span class="number">5</span>; hex_values[<span class="string">&#x27;6&#x27;</span>] = <span class="number">6</span>; hex_values[<span class="string">&#x27;7&#x27;</span>] = <span class="number">7</span>;</span><br><span class="line">    hex_values[<span class="string">&#x27;8&#x27;</span>] = <span class="number">8</span>; hex_values[<span class="string">&#x27;9&#x27;</span>] = <span class="number">9</span>;</span><br><span class="line"></span><br><span class="line">    hex_values[<span class="string">&#x27;a&#x27;</span>] = <span class="number">10</span>; hex_values[<span class="string">&#x27;b&#x27;</span>] = <span class="number">11</span>; hex_values[<span class="string">&#x27;c&#x27;</span>] = <span class="number">12</span>; hex_values[<span class="string">&#x27;d&#x27;</span>] = <span class="number">13</span>;</span><br><span class="line">    hex_values[<span class="string">&#x27;e&#x27;</span>] = <span class="number">14</span>; hex_values[<span class="string">&#x27;f&#x27;</span>] = <span class="number">15</span>;</span><br><span class="line"></span><br><span class="line">    hex_values[<span class="string">&#x27;A&#x27;</span>] = <span class="number">10</span>; hex_values[<span class="string">&#x27;B&#x27;</span>] = <span class="number">11</span>; hex_values[<span class="string">&#x27;C&#x27;</span>] = <span class="number">12</span>; hex_values[<span class="string">&#x27;D&#x27;</span>] = <span class="number">13</span>;</span><br><span class="line">    hex_values[<span class="string">&#x27;E&#x27;</span>] = <span class="number">14</span>; hex_values[<span class="string">&#x27;F&#x27;</span>] = <span class="number">15</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">cgi_decode</span><span class="params">(<span class="keyword">char</span> *s, <span class="keyword">char</span> *t)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (*s != <span class="string">&#x27;\0&#x27;</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (*s == <span class="string">&#x27;+&#x27;</span>)</span><br><span class="line">            *t++ = <span class="string">&#x27; &#x27;</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (*s == <span class="string">&#x27;%&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> digit_high = *++s;</span><br><span class="line">            <span class="keyword">int</span> digit_low = *++s;</span><br><span class="line">            <span class="keyword">if</span> (hex_values[digit_high] &gt;= <span class="number">0</span> &amp;&amp; hex_values[digit_low] &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                *t++ = hex_values[digit_high] * <span class="number">16</span> + hex_values[digit_low];</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            *t++ = *s;</span><br><span class="line">        s++;</span><br><span class="line">    &#125;</span><br><span class="line">    *t = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    init_hex_values();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (argc &gt;= <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">char</span> *s = argv[<span class="number">1</span>];</span><br><span class="line">        <span class="keyword">char</span> *t = <span class="built_in">malloc</span>(<span class="built_in">strlen</span>(s) + <span class="number">1</span>); <span class="comment">/* output is at most as long as input */</span></span><br><span class="line">        <span class="keyword">int</span> ret = cgi_decode(s, t);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, t);</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;cgi_decode: usage: cgi_decode STRING\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>파이썬과 같은 코드로 c를 짠다.</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">cc --coverage -o cgi_decode cgi_decode.c</span><br></pre></td></tr></table></figure>
+<ul>
+<li>컴파일 단계에서 –coverage 옵션을 준다. –coverage옵션은 런타임에 정보가 수집되도록 코드를 instrument한다.<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">./cgi_decode <span class="string">&#x27;Send+mail+to+me%40fuzzingbook.org&#x27;</span></span><br></pre></td></tr></table></figure></li>
+<li>프로그램을 실행할 때 커버리지 정보는 파일로 자동 생성된다.</li>
+<li>커버러지 정보는 gcov 프로그램에 의해 수집된다.</li>
+<li>주어진 모든 소스 파일에 대해 커버리지 정보가 포함된 새로운 .gcov 파일을 생성한다.<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">gcov cgi_decode.c</span><br></pre></td></tr></table></figure></li>
+<li>.gcov 파일에서 각 행은 호출된 횟수와 줄 번호가 앞에 붙는다. </li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/155462777-a1ae55fd-f95a-4d44-859e-c089ea15b972.png" alt="image"></p>
+]]></content>
+      <categories>
+        <category>Fuzzing</category>
+      </categories>
+      <tags>
+        <tag>fuzzing</tag>
+        <tag>theory</tag>
+      </tags>
+  </entry>
 </search>
