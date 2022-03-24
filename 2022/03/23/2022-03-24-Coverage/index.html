@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"pwnkidhn.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="커버리지에 대한 의미는 이전 포스팅에 간략하게 정의했으니 넘어가겠다. https:&#x2F;&#x2F;pwnkidhn.github.io&#x2F;2022&#x2F;02&#x2F;21&#x2F;2022-02-23-02_Coverage&#x2F;   퍼징을 진행하는데 있어 커버리지 측정에 대한 개념이 제대로 잡히질 않아  몇 가지 의문이 들었다.   커버리지 측정 계산은 어떻게 하는 것일까? coverage guided">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Code Coverage Measurement with Dynamo Rio &amp; Lighthouse">
+<meta property="og:url" content="https://pwnkidhn.github.io/2022/03/23/2022-03-24-Coverage/index.html">
+<meta property="og:site_name" content="rvkhunLab">
+<meta property="og:description" content="커버리지에 대한 의미는 이전 포스팅에 간략하게 정의했으니 넘어가겠다. https:&#x2F;&#x2F;pwnkidhn.github.io&#x2F;2022&#x2F;02&#x2F;21&#x2F;2022-02-23-02_Coverage&#x2F;   퍼징을 진행하는데 있어 커버리지 측정에 대한 개념이 제대로 잡히질 않아  몇 가지 의문이 들었다.   커버리지 측정 계산은 어떻게 하는 것일까? coverage guided">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/159886495-70ab1ec9-2379-4268-8ab1-29c329d0ae48.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/159887032-cece2318-29e3-47f9-ba2c-b7559ce55e59.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/159891718-bee7e6f9-d199-45f5-b534-798ef4ce0961.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/159888937-fef9e771-721d-4c14-8152-c7294b9b9b6a.png">
+<meta property="article:published_time" content="2022-03-23T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-24T10:33:46.141Z">
+<meta property="article:author" content="rvkhun">
+<meta property="article:tag" content="fuzzing">
+<meta property="article:tag" content="theory">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/49066484/159886495-70ab1ec9-2379-4268-8ab1-29c329d0ae48.png">
+
+<link rel="canonical" href="https://pwnkidhn.github.io/2022/03/23/2022-03-24-Coverage/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Code Coverage Measurement with Dynamo Rio & Lighthouse | rvkhunLab</title>
+  <meta name="google-site-verification" content="eBj8hDfb8V5sujjVERa_zAbaTQFLbQzowFQfUz3Rhw8">
+  <meta name="naver-site-verification" content="7c18a15cd138e9448d263381fe6201215fc40046">
+
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/rss2.xml" title="rvkhunLab" type="application/rss+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">rvkhunLab</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Write about System Hacking</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="Searching..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://pwnkidhn.github.io/2022/03/23/2022-03-24-Coverage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/raccoon1.jpg">
+      <meta itemprop="name" content="rvkhun">
+      <meta itemprop="description" content="Security Researcher / CTF Player">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="rvkhunLab">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Code Coverage Measurement with Dynamo Rio & Lighthouse
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-03-24 00:00:00 / Modified: 19:33:46" itemprop="dateCreated datePublished" datetime="2022-03-24T00:00:00+09:00">2022-03-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Fuzzing/" itemprop="url" rel="index"><span itemprop="name">Fuzzing</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>커버리지에 대한 의미는 이전 포스팅에 간략하게 정의했으니 넘어가겠다.<ul>
+<li><a href="https://pwnkidhn.github.io/2022/02/21/2022-02-23-02_Coverage/">https://pwnkidhn.github.io/2022/02/21/2022-02-23-02_Coverage/</a></li>
+</ul>
+</li>
+<li>퍼징을 진행하는데 있어 커버리지 측정에 대한 개념이 제대로 잡히질 않아  몇 가지 의문이 들었다.</li>
+</ul>
+<ol>
+<li>커버리지 측정 계산은 어떻게 하는 것일까?</li>
+<li>coverage guided 퍼징 시 커버리지 측정이 어디까지 되는것인가?, 어느 부분이 필요한가? </li>
+<li>Windows 프로그램을 예시로, A회사의 프로그램을 퍼징하면서 WINAPI의 취약점을 찾을 수 도 있는 것일까? </li>
+</ol>
+<ul>
+<li>조사를 통해 의문에 대한 나만의 답을 찾았지만, 잘 못 이해한것일 수 도 있으니 참고만 하자.<span id="more"></span></li>
+</ul>
+<h2 id="환경"><a href="#환경" class="headerlink" title="환경"></a>환경</h2><ul>
+<li>커버리지 측정을 보기위해 Windows 환경에서 DynamoRIO와 Lighthouse를 사용하였다.</li>
+<li>구축 방법은 공식 홈페이지를 참고하면 된다.</li>
+<li>DynamoRio : <a target="_blank" rel="external nofollow noopener noreferrer" href="https://dynamorio.org/page_releases.html">https://dynamorio.org/page_releases.html</a></li>
+<li>Lighthouse : <a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/gaasedelen/lighthouse">https://github.com/gaasedelen/lighthouse</a></li>
+</ul>
+<h2 id="실습"><a href="#실습" class="headerlink" title="실습"></a>실습</h2><ul>
+<li>ipconfig 바이너리를 가지고 코드 커버리지를 측정해 보겠다.</li>
+<li>아래 명령어를 통해 커버리지 로그를 얻을 수 있다.</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd C:..\DynamoRIO-Windows-9.0.1\bin64</span><br><span class="line">drrun -t drcov -dump_text -- [PATH]</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://user-images.githubusercontent.com/49066484/159886495-70ab1ec9-2379-4268-8ab1-29c329d0ae48.png" alt="image"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">DRCOV VERSION: 2</span><br><span class="line">DRCOV FLAVOR: drcov</span><br><span class="line">Module Table: version 5, count 18</span><br><span class="line">Columns: id, containing_id, start, end, entry, offset, preferred_base, checksum, timestamp, path</span><br><span class="line">  0,   0, 0x0000000071000000, 0x00000000711c0000, 0x00000000710a2e70, 0000000000000000, 0x0000000071000000, 0x0019203b, 0x620aa6ec,  C:\Users\pwnki\Desktop\DynamoRIO-Windows-9.0.1\lib64\release\dynamorio.dll</span><br><span class="line">  1,   1, 0x00007ff63a6a0000, 0x00007ff63a6a6000, 0x00007ff63a6a0000, 0000000000000000, 0x0000000072000000, 0x0000ab8b, 0x620aa777,  C:\Users\pwnki\Desktop\DynamoRIO-Windows-9.0.1\tools\lib64\release\drcov.dll</span><br><span class="line">  2,   2, 0x00007ff63a6b0000, 0x00007ff63a6b9000, 0x00007ff63a6b0000, 0000000000000000, 0x0000000073800000, 0x0001401b, 0x620aa776,  C:\Users\pwnki\Desktop\DynamoRIO-Windows-9.0.1\ext\lib64\release/drcovlib.dll</span><br><span class="line">  3,   3, 0x00007ff63a6c0000, 0x00007ff63a6cf000, 0x00007ff63a6c0000, 0000000000000000, 0x0000000077000000, 0x000149e8, 0x620aa772,  C:\Users\pwnki\Desktop\DynamoRIO-Windows-9.0.1\ext\lib64\release/drx.dll</span><br><span class="line">  4,   4, 0x00007ff63a6d0000, 0x00007ff63a6db000, 0x00007ff63a6d0000, 0000000000000000, 0x0000000078000000, 0x0001746d, 0x620aa761,  C:\Users\pwnki\Desktop\DynamoRIO-Windows-9.0.1\ext\lib64\release/drreg.dll</span><br><span class="line">  5,   5, 0x00007ff63a6e0000, 0x00007ff63a6f0000, 0x00007ff63a6e0000, 0000000000000000, 0x0000000073000000, 0x00014cc5, 0x620aa75e,  C:\Users\pwnki\Desktop\DynamoRIO-Windows-9.0.1\ext\lib64\release/drmgr.dll</span><br><span class="line">  6,   6, 0x00007ff69a690000, 0x00007ff69a69d000, 0x00007ff69a6952c0, 0000000000000000, 0x00007ff69a690000, 0x00016cf7, 0x60005d63,  C:\Windows\System32\ipconfig.exe</span><br><span class="line">  7,   7, 0x00007ffccdb20000, 0x00007ffccdb37000, 0x00007ffccdb224b0, 0000000000000000, 0x00007ffccdb20000, 0x00014e4a, 0xc962e034,  C:\Windows\System32\dhcpcsvc6.DLL</span><br><span class="line">  8,   8, 0x00007ffccdbb0000, 0x00007ffccdbcd000, 0x00007ffccdbb29b0, 0000000000000000, 0x00007ffccdbb0000, 0x0002666a, 0x1c1d619d,  C:\Windows\System32\dhcpcsvc.DLL</span><br><span class="line">  9,   9, 0x00007ffcd2200000, 0x00007ffcd223b000, 0x00007ffcd220a620, 0000000000000000, 0x00007ffcd2200000, 0x0003ecbd, 0xcf9a121a,  C:\Windows\System32\IPHLPAPI.DLL</span><br><span class="line"> 10,  10, 0x00007ffcd2240000, 0x00007ffcd230b000, 0x00007ffcd226be10, 0000000000000000, 0x00007ffcd2240000, 0x000ca5e2, 0x441ccbe1,  C:\Windows\System32\DNSAPI.dll</span><br><span class="line"> 11,  11, 0x00007ffcd2df0000, 0x00007ffcd30b8000, 0x00007ffcd2e01bd0, 0000000000000000, 0x00007ffcd2df0000, 0x002d64e4, 0x1183946c,  C:\Windows\System32\KERNELBASE.dll</span><br><span class="line"> 12,  12, 0x00007ffcd3fe0000, 0x00007ffcd409d000, 0x00007ffcd3ff70d0, 0000000000000000, 0x00007ffcd3fe0000, 0x000c8b3e, 0x2f7cc9b6,  C:\Windows\System32\KERNEL32.DLL</span><br><span class="line"> 13,  13, 0x00007ffcd4f60000, 0x00007ffcd4fcb000, 0x00007ffcd4f74300, 0000000000000000, 0x00007ffcd4f60000, 0x0006cf4b, 0xaff3315b,  C:\Windows\System32\WS2_32.dll</span><br><span class="line"> 14,  14, 0x00007ffcd5000000, 0x00007ffcd5008000, 0x00007ffcd50022f0, 0000000000000000, 0x00007ffcd5000000, 0x000117c5, 0xaa9c8581,  C:\Windows\System32\NSI.dll</span><br><span class="line"> 15,  15, 0x00007ffcd50a0000, 0x00007ffcd513e000, 0x00007ffcd50a7850, 0000000000000000, 0x00007ffcd50a0000, 0x0009e85d, 0x564f9f39,  C:\Windows\System32\msvcrt.dll</span><br><span class="line"> 16,  16, 0x00007ffcd5510000, 0x00007ffcd5634000, 0x00007ffcd556db80, 0000000000000000, 0x00007ffcd5510000, 0x0012ce1d, 0x76243d9a,  C:\Windows\System32\RPCRT4.dll</span><br><span class="line"> 17,  17, 0x00007ffcd56b0000, 0x00007ffcd58a6000, 0x00007ffcd56b0000, 0000000000000000, 0x00007ffcd56b0000, 0x001fd6e7, 0xe5d7ed5c,  C:\Windows\SYSTEM32\ntdll.dll</span><br><span class="line">BB Table: 14257 bbs</span><br><span class="line">module id, start, size:</span><br><span class="line">module[ 17]: 0x000000000004cea0,  19</span><br><span class="line">module[ 17]: 0x000000000004ceb3,  14</span><br><span class="line">module[ 17]: 0x000000000008b7c0,  29</span><br><span class="line">module[ 17]: 0x000000000008b7dd,   6</span><br><span class="line">module[ 17]: 0x000000000008b7f1,  10</span><br><span class="line">module[ 17]: 0x000000000008b7fb,   3</span><br><span class="line">module[ 12]: 0x0000000000017020,   8</span><br><span class="line">module[ 12]: 0x0000000000017028,  12</span><br><span class="line">module[ 17]: 0x000000000008b7e3,   3</span><br><span class="line">module[  6]: 0x00000000000052c0,   9</span><br><span class="line">module[  6]: 0x00000000000057e4,  44</span><br><span class="line">module[  6]: 0x00000000000058a3,  21</span><br><span class="line">module[  6]: 0x00000000000052c9,   9</span><br><span class="line">module[  6]: 0x00000000000050f0,  49</span><br><span class="line">module[  6]: 0x000000000000513c,  15</span><br><span class="line">module[  6]: 0x0000000000005157,  10</span><br><span class="line">module[  6]: 0x0000000000005161,  34</span><br><span class="line">module[  6]: 0x0000000000005183,   4</span><br><span class="line">module[  6]: 0x0000000000005187,   6</span><br><span class="line">module[  6]: 0x000000000000519d,  11</span><br><span class="line">module[  6]: 0x000000000000517e,   5</span><br><span class="line">module[  6]: 0x000000000000518d,  12</span><br><span class="line">module[  6]: 0x0000000000004fc0,  18</span><br><span class="line">module[  6]: 0x0000000000004fd6,  25</span><br></pre></td></tr></table></figure>
+<ul>
+<li>로그의 일부분으로, 바이너리가 실행에 필요한 모든 dll들을 로드하며, 거기에 대한 커버리지를 측정한다. </li>
+<li>IDA로 커버리지 확인을 할 바이너리 혹은 DLL을 열고, Lighthouse를 통해 커버리지 로그를 불러오면 아래와 같이 확인할 수 있다.</li>
+<li>(Ipconfig.exe에 대한 커버리지 확인)</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/159887032-cece2318-29e3-47f9-ba2c-b7559ce55e59.png" alt="image"></p>
+<ul>
+<li>block 단위로 커버리지를 측정하는 것을 확인할 수 있다. </li>
+<li>또한 전체 블록 중 몇 개의 블록을 커버했는지 확인할 수 있다.</li>
+<li>이를 바탕으로 커버리지를 수치화하는 방법은 (커버한 블록 / 전체 블록) 으로 계산하는 것 같다.</li>
+</ul>
+<ul>
+<li>1번 의문은 커버리지를 측정하기 위해 인스트루먼트 단계에서 전체 블록에 대한 값을 얻을 수 있고,</li>
+<li>커버한 블록 갯수 역시 얻을 수 있기에 이 둘을 활용하여 계산 하는 것으로 확인했다.</li>
+</ul>
+<ul>
+<li>2번, 3번 의문을 풀기 위해 예시를 들어보겠다.</li>
+<li>프로그램 A, A.dll, Windows.dll 세 개의 파일이 있다고 가정하자. (프로그램 마다 다르다.)</li>
+</ul>
+<ol>
+<li>프로그램 A는 A회사에서 만든 모듈로, 코드에는 A.dll에 있는 함수를 호출해서 사용하거나 자체적인 함수가 내장되어 있다.</li>
+<li>A.dll은 A 회사에서 만든 자체 함수들이 정의되어 있다. 여기 있는 함수는 Windows에서 제공하는 WINAPI를 바탕으로 만들어진 함수이다.</li>
+<li>Windows.dll은 WINAPI 함수들이 정의되어 있다. </li>
+</ol>
+<ul>
+<li>전체적인 흐름은 아래와 같다.<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">프로그램 A (A.dll에 있는 함수 일부 호출) -&gt; A.dll(자체함수 정의 부분, 내부적으로 WINAPI 호출) -&gt; Windows.dll(WINAPI 함수 정의부분)</span><br></pre></td></tr></table></figure></li>
+<li>여기서 드는 의문은 과연 코드 커버리지는 어디 까지 측정되며, 어디 까지 측정 해야 할까. 그리고 프로그램 A를 퍼징한다면 결국 Windows.dll에 있는 WINAPI에 대한 취약점도 찾을 수 있는 것인가 이다.</li>
+</ul>
+<ul>
+<li>DynamoRio를 통해 확인 한 결과, 커버리지는 전체 다 측정 되는 것으로 확인할 수 있다.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/159891718-bee7e6f9-d199-45f5-b534-798ef4ce0961.png" alt="image"></p>
+<ul>
+<li><p>커버리지 로그를 보면 바이너리 실행 시 로드 되는 모든 dll에 대해 인스트루먼트를 진행하고, 커버리지를 측정하는 것을 확인할 수 있다.</p>
+</li>
+<li><p>(로드된 dll에 대한 커버리지)</p>
+</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/159888937-fef9e771-721d-4c14-8152-c7294b9b9b6a.png" alt="image"></p>
+<ul>
+<li>그럼 A 회사 제품에 대한 퍼즈 테스팅을 위해서라면 어디까지의 커버리지 정보가 필요할까</li>
+</ul>
+<ol>
+<li><p>프로그램 A에 대해 측정한다면, 발생하는 버그는 A.dll에 있는 함수들을 잘 못 사용해서 발생하는것으로, 함수 호출 순서나 방법을 고치면 된다. 혹은 프로그램에 정의된 함수의 로직이 잘 못되어 발생하는 경우이다.</p>
+</li>
+<li><p>A.dll에 대해 측정한다면, 발생하는 버그는 Windows.dll의 WINAPI들을 잘 못 사용해서 발생하는 것으로, A.dll의 함수 로직을 고쳐야한다.</p>
+<ul>
+<li>Harness 프로그램을 dll에 있는 함수를 가지고 짠다면, 커버리지를 해당 dll을 측정해야 한다. </li>
+</ul>
+</li>
+<li><p>Windows.dll에 대해 측정한다면, 발생하는 버그는 WINAPI 함수의 로직에서 발생하는 것이다. 즉 A 회사 제품에 대한 취약점을 찾는 것이 아니다. WINAPI 함수 로직을 고쳐야한다.</p>
+</li>
+</ol>
+<ul>
+<li>또한 보통 3번의 경우는 흔하지 않아 보인다.</li>
+</ul>
+<ul>
+<li><p>결론을 내리면, 의문 2는 퍼즈 테스팅 대상에 따라 다르다고 볼 수 있다. 공격 벡터를 정하고, 해당 기능을 처리하는 부분을 대상으로 퍼즈 테스팅을 진행하기에, 해당 부분의 커버리지가 필요하다.</p>
+</li>
+<li><p>그 부분이 프로그램에 정의 되어 있다면, 프로그램에 대한 커버리지가 필요하고, dll로 따로 정의 되어있다면 dll에 대한 커버리지가 필요하다. </p>
+</li>
+<li><p>WinAFL 퍼저의 경우 커버리지 측정 모듈을 지정해주는 옵션이 있어 필요한 커버리지만 얻을 수 있다.</p>
+</li>
+<li><p>의문 3은 흔하지 않은 경우로 생각 된다. A 제품에 대한 보안 검사로 A회사가 자체적으로 만든 프로그램이나 dll에 대해서만 퍼즈 테스팅을 진행하고, 커버리지를 측정하면 될 것 같다.</p>
+</li>
+</ul>
+<h2 id="결론"><a href="#결론" class="headerlink" title="결론"></a>결론</h2><p>바이너리와 실행시 로드되는 DLL 전부 인스트루먼트를 진행 하고, 커버리지를 측정한다.<br>퍼즈 테스팅 대상에 따라 필요한 커버리지 정보가 다르다.</p>
+<h2 id="참고"><a href="#참고" class="headerlink" title="참고"></a>참고</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.youtube.com/watch?v=g6Jp3KZNles">https://www.youtube.com/watch?v=g6Jp3KZNles</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/fuzzing/" rel="tag"># fuzzing</a>
+              <a href="/tags/theory/" rel="tag"># theory</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/02/23/2022-02-24-03_Mutation/" rel="prev" title="The Fuzzing Book_03_Mutation-Based Fuzzing">
+      <i class="fa fa-chevron-left"></i> The Fuzzing Book_03_Mutation-Based Fuzzing
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%ED%99%98%EA%B2%BD"><span class="nav-number">1.</span> <span class="nav-text">환경</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EC%8B%A4%EC%8A%B5"><span class="nav-number">2.</span> <span class="nav-text">실습</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EA%B2%B0%EB%A1%A0"><span class="nav-number">3.</span> <span class="nav-text">결론</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EC%B0%B8%EA%B3%A0"><span class="nav-number">4.</span> <span class="nav-text">참고</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="rvkhun" src="/images/raccoon1.jpg">
+  <p class="site-author-name" itemprop="name">rvkhun</p>
+  <div class="site-description" itemprop="description">Security Researcher / CTF Player</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:pwnkidhn@gmail.com" title="E-Mail → mailto:pwnkidhn@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://youtube.com/" title="YouTube → https:&#x2F;&#x2F;youtube.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-youtube"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/_choizy_" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;_choizy_" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-instagram"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">rvkhun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Gemini</a>
+  </div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
