@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"pwnkidhn.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="ARM (Advanced RISC machine) CISC(complex instruction set computer)  Micro programming 방식 : 기계어 하나를 실행하기 위해 많은 양의 작은 micro instruction들이 숨어서 실행 RISC(Reduced Instruction set computer)  Hard wired 방식 :">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Embedded Recipes_2_ARM을 파헤쳐 보자">
+<meta property="og:url" content="https://pwnkidhn.github.io/2022/03/27/2022-03-28-2_ARM/index.html">
+<meta property="og:site_name" content="rvkhunLab">
+<meta property="og:description" content="ARM (Advanced RISC machine) CISC(complex instruction set computer)  Micro programming 방식 : 기계어 하나를 실행하기 위해 많은 양의 작은 micro instruction들이 숨어서 실행 RISC(Reduced Instruction set computer)  Hard wired 방식 :">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/160324775-67400041-6489-41b8-95d0-a8c950ce020e.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/160324936-54e18292-7cb6-47da-98f2-239e325252d4.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/160336597-f44c982e-f2db-41a6-9bcc-af9d64d34fd5.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/160337033-88e2b1cc-7060-4502-acf5-065a53712ed9.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/160337383-9a0e4bbe-b1a9-448a-b1a2-f00a79a32577.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/160342208-5cbb9bc9-c6a1-49ca-872f-dac08e406cae.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/160343869-ed3b43b5-dc44-4b89-83bb-34b4399ccc6b.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/160345077-565063a5-7282-4e91-9bfa-fea17214e86f.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/160349107-4605d2bc-8d8f-46be-95e8-138aab69444b.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/49066484/160350245-766e5338-3542-4ec1-8278-18ba4e8715ce.png">
+<meta property="article:published_time" content="2022-03-27T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-28T07:57:08.376Z">
+<meta property="article:author" content="rvkhun">
+<meta property="article:tag" content="Embedded">
+<meta property="article:tag" content="ARM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/49066484/160324775-67400041-6489-41b8-95d0-a8c950ce020e.png">
+
+<link rel="canonical" href="https://pwnkidhn.github.io/2022/03/27/2022-03-28-2_ARM/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Embedded Recipes_2_ARM을 파헤쳐 보자 | rvkhunLab</title>
+  <meta name="google-site-verification" content="eBj8hDfb8V5sujjVERa_zAbaTQFLbQzowFQfUz3Rhw8">
+  <meta name="naver-site-verification" content="7c18a15cd138e9448d263381fe6201215fc40046">
+
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/rss2.xml" title="rvkhunLab" type="application/rss+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">rvkhunLab</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Write about System Hacking</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="Searching..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://pwnkidhn.github.io/2022/03/27/2022-03-28-2_ARM/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/raccoon1.jpg">
+      <meta itemprop="name" content="rvkhun">
+      <meta itemprop="description" content="Security Researcher / CTF Player">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="rvkhunLab">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Embedded Recipes_2_ARM을 파헤쳐 보자
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-03-28 00:00:00 / Modified: 16:57:08" itemprop="dateCreated datePublished" datetime="2022-03-28T00:00:00+09:00">2022-03-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/EmbeddedSystem/" itemprop="url" rel="index"><span itemprop="name">EmbeddedSystem</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>ARM (Advanced RISC machine)</li>
+<li>CISC(complex instruction set computer)<br>  Micro programming 방식 : 기계어 하나를 실행하기 위해 많은 양의 작은 micro instruction들이 숨어서 실행</li>
+<li>RISC(Reduced Instruction set computer)<br>  Hard wired 방식 : 기계어 한줄을 실행하기 위하여, 그에 해당하는 노리회로를 구성하여 구현하는 방식. </li>
+</ul>
+<span id="more"></span>
+<h2 id="CISC-vs-RISC"><a href="#CISC-vs-RISC" class="headerlink" title="CISC vs RISC"></a>CISC vs RISC</h2><h3 id="CISC-Complex-Instruction-Set-Computer"><a href="#CISC-Complex-Instruction-Set-Computer" class="headerlink" title="CISC (Complex Instruction Set Computer)"></a>CISC (Complex Instruction Set Computer)</h3><p>하나의 명령어당 최대한 많은 작업을 수행</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/160324775-67400041-6489-41b8-95d0-a8c950ce020e.png" alt="image"></p>
+<ul>
+<li>명령어의 길이가 가변적</li>
+<li>복잡한 기능이 많은 명령어로 구성된 프로세서</li>
+<li>복합 명령을 가짐으로써 하위 호환성을 충분히 확보</li>
+<li>전력소모가 큼, 속도가 느리고 가격이 비쌈</li>
+<li>호환성이 절대적으로 필요한 PC 환경에서 사용</li>
+</ul>
+<h3 id="RISC-Reduced-Instruction-Set-Computer"><a href="#RISC-Reduced-Instruction-Set-Computer" class="headerlink" title="RISC (Reduced Instruction Set Computer)"></a>RISC (Reduced Instruction Set Computer)</h3><p>명령어 하나당 하나의 연산만을 수행</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/160324936-54e18292-7cb6-47da-98f2-239e325252d4.png" alt="image"></p>
+<ul>
+<li>명령어의 길이가 고정적</li>
+<li>하드웨어가 간단한 대신, 소프트웨어가 복잡함.</li>
+<li>전력소모가 적음, 속도가 빠르고 가격이 저렴</li>
+<li>하위 호환을 위해 에뮬레이션 방식을 채택, 호환성 부족</li>
+</ul>
+<h2 id="ARM-mode-and-Thumb-mode"><a href="#ARM-mode-and-Thumb-mode" class="headerlink" title="ARM mode and Thumb mode"></a>ARM mode and Thumb mode</h2><h3 id="Thumb-mode"><a href="#Thumb-mode" class="headerlink" title="Thumb mode"></a>Thumb mode</h3><ul>
+<li>Thumb mode는 ARM mode의 반쪽으로 볼 수 있다.</li>
+<li>처음 32 bit ARM가 나왔을 때, 임베디드 시스템 메모리는 16비트 data line을 가진 메모리가 주 였다. 따라서 32 bit 코어라해도, 메모리를 효율적으로 사용하기 위해서는 16비트 처리가 필요하다.</li>
+</ul>
+<h3 id="ARM의-동작-mode"><a href="#ARM의-동작-mode" class="headerlink" title="ARM의 동작 mode"></a>ARM의 동작 mode</h3><p>User (USR) : Normal Program execution mode<br>System (SYS) : Run privileged operating system tasks<br>Fast Interrupt Request (FIQ) : When a high priority (fast) interrupt is raised<br>Interrupt Request (IRQ) : When a low priority (normal) interrupt is raised<br>Supervisor (SVC) : A protected mode for the operatng system, entered when a SWI instruction is exectued<br>Abort (ABT) : Used to handle memory access violations<br>Undef (UND) : Used to handle undefined instructions</p>
+<ul>
+<li>USR은 Application program을 실행하는 모드.</li>
+<li>SYS는 USR와 비슷하지만, 특권을 가지고 있다는 차이가 있음.</li>
+<li>SVC는 SWI 명령이 발생하면 전환된다. 대부분의 시스템 자원을 자유롭게 관리할 수 있는 모드.</li>
+</ul>
+<h3 id="Privileged-Mode-vs-Normal-mode"><a href="#Privileged-Mode-vs-Normal-mode" class="headerlink" title="Privileged Mode vs Normal mode"></a>Privileged Mode vs Normal mode</h3><ul>
+<li>USR을 제외한 모든 모드는 특권 모드이다.</li>
+</ul>
+<ol>
+<li>특권 모드는 IRQ, FIQ등의 인터럽트의 사용 가능 유무를 직접 설정 할 수 있다.</li>
+<li>특권 모드는 서로 모드 변경이 자유롭게 가능하지만, 일반 모드에서 특권 모드의 변경은 불가능 하다.</li>
+<li>ARM의 기본적인 mode는 SVC모드이다. 부팅시 ARM에 대한 모든 권한을 행사하기 위함.</li>
+</ol>
+<h2 id="ARM-Register"><a href="#ARM-Register" class="headerlink" title="ARM Register"></a>ARM Register</h2><p><img src="https://user-images.githubusercontent.com/49066484/160336597-f44c982e-f2db-41a6-9bcc-af9d64d34fd5.png" alt="image"></p>
+<ul>
+<li>ARM core는 모드가 바뀌면서 사용하는 레지스터 셋도 바뀐다.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/160337033-88e2b1cc-7060-4502-acf5-065a53712ed9.png" alt="image"></p>
+<ul>
+<li>모든 모드가 공유하는 레지스터는 CPSR, PC, R0~R7</li>
+</ul>
+<h3 id="특별한-용도의-레지스터"><a href="#특별한-용도의-레지스터" class="headerlink" title="특별한 용도의 레지스터"></a>특별한 용도의 레지스터</h3><p>CPSR : Current Program Status Register</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/160337383-9a0e4bbe-b1a9-448a-b1a2-f00a79a32577.png" alt="image"></p>
+<ul>
+<li>NZCV : 연산 후 결과 값에 따라 set 됨.</li>
+<li>IF : IRQ나 FIQ가 걸릴 수 있는지에 관한 필드, 인터럽트에 대한 컨트롤이 가능하다.</li>
+<li>T : Thunmb 모드 set</li>
+<li>mode : 현재 mode를 나타냄. </li>
+</ul>
+<p>SPSR : Saved Program Status Register</p>
+<ul>
+<li>CPSR를 복사해 넣는 특수 레지스터.</li>
+<li>CPSR를 백업하기 위함.</li>
+<li>모드 변경 시 사용.</li>
+</ul>
+<p>R14 : Linked Register (RBP)</p>
+<ul>
+<li>리턴 주소를 담고 있다.</li>
+</ul>
+<p>R13 : Stack Pointer (RSP)</p>
+<ul>
+<li>현재 스택의 꼭대가를 가리킴</li>
+</ul>
+<p>R15 : Program Counter (RIP)</p>
+<ul>
+<li>다음 실행할 명령어를 가리킴.</li>
+<li>현재 Fetch 해 온 위치를 가리킴. (현재 까지 실행된거 X)</li>
+</ul>
+<h3 id="Context-Switching"><a href="#Context-Switching" class="headerlink" title="Context Switching"></a>Context Switching</h3><ul>
+<li>문맥 전환,</li>
+<li>프로세스 실행 중, 인터럽트로 인해 다른 프로세스가 실행될 때</li>
+<li>레지스터 값을 교체하는 작업</li>
+</ul>
+<h2 id="ARM-Exception"><a href="#ARM-Exception" class="headerlink" title="ARM Exception"></a>ARM Exception</h2><ul>
+<li><p>Exception은 Interrupt를 포함한 더 큰 사건,</p>
+</li>
+<li><p>외부 요청, 오류에 관련된 사건.</p>
+</li>
+<li><p>Interrupt : 제어 흐름에서 예상치 못한 외부에서 전달되는 사건.</p>
+</li>
+<li><p>Exception : 프로세서 내부에서 발생하는 예상치 못한 사건.</p>
+</li>
+</ul>
+<h3 id="내부-인터럽트-exception"><a href="#내부-인터럽트-exception" class="headerlink" title="내부 인터럽트 (exception)"></a>내부 인터럽트 (exception)</h3><ul>
+<li>SVC 인터럽트 : 외부의 프로그램이 의도적으로 호출.</li>
+<li>산술 오버플로우/언더플로우</li>
+<li>0 으로 나누기</li>
+<li>정의 안된 명령어 수행</li>
+</ul>
+<h3 id="외부-인터럽트-interrupt"><a href="#외부-인터럽트-interrupt" class="headerlink" title="외부 인터럽트 (interrupt)"></a>외부 인터럽트 (interrupt)</h3><ul>
+<li>I/O 인터럽트 : 입출력 요구가 있을 때 하드웨어가 발생</li>
+<li>전원 이상 인터럽트</li>
+<li>기계 착오 인터럽트 : CPU 등의 기능적 오류</li>
+<li>외부 신호 인터럽트 : Timer등으로 발생.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/160342208-5cbb9bc9-c6a1-49ca-872f-dac08e406cae.png" alt="image"></p>
+<ul>
+<li>Exception이 발생하면, 그 Exception에 해당하는 미리 정해진 주소의 프로그램을 하드웨어적으로 수행함.</li>
+<li>이 주소를 Exception Vector라 한다.</li>
+</ul>
+<ol>
+<li>SVC mode : SVC 모드는 power on이나 reset이 일어난 경우에 진입한다.</li>
+<li>IRQ mode : 하드웨어적인 인터럽트가 발생하면 진입한다.</li>
+<li>FIQ mode : 인터럽트 중에 Fast 인터럽트가 발생하면 진입한다.</li>
+<li>ABT mode : Access하는 주소가 Access 할 수 없는 경우, 명령어를 Fetch를 못할 경우. 에 진입한다.</li>
+<li>UND mode : 명령어를 해석했는데 ARM이 모르는 명령어일 경우 진입한다. 보통 메모리 커럽션이 나면 발생, &gt; 이를 응용하면 일부러 코드를 삽입하여 UND vector 주소로 jmp하도록 할 수 있음.</li>
+</ol>
+<p><img src="https://user-images.githubusercontent.com/49066484/160343869-ed3b43b5-dc44-4b89-83bb-34b4399ccc6b.png" alt="image"></p>
+<h3 id="Exception-우선-순위"><a href="#Exception-우선-순위" class="headerlink" title="Exception 우선 순위"></a>Exception 우선 순위</h3><ol>
+<li>Reset</li>
+<li>Data Abort</li>
+<li>FIQ</li>
+<li>IRQ</li>
+<li>Prefetch Abort</li>
+<li>Undefined Instruction</li>
+<li>SWI</li>
+</ol>
+<h3 id="Exception-처리-과정"><a href="#Exception-처리-과정" class="headerlink" title="Exception 처리 과정"></a>Exception 처리 과정</h3><ul>
+<li>Exception이 발생 한 후, 이전 모드로 돌아갈 수 있어야 한다.</li>
+<li>Register 값을 다시 사용할 수 있어야 한다. 이전에 쓰던 Context를 다시 복원할 수 있어야 한다.</li>
+<li>이전 모드로 돌아갔을 때 원래 수행하던 곳으로 돌아갈 수 있어야 한다.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/160345077-565063a5-7282-4e91-9bfa-fea17214e86f.png" alt="image"></p>
+<h2 id="ARM-Procedure-Call-Standard-함수-호출-규약"><a href="#ARM-Procedure-Call-Standard-함수-호출-규약" class="headerlink" title="ARM Procedure Call Standard (함수 호출 규약)"></a>ARM Procedure Call Standard (함수 호출 규약)</h2><ol>
+<li>함수를 부를 때 레지스터는 어떻게 사용 하는가.</li>
+<li>return 값은 어떻게 돌려 주는가.</li>
+<li>스택은 어떨 때, 어떻게 사용되는가.</li>
+<li>일반적인 레지스터들은 어떻게 사용되는가.</li>
+</ol>
+<p><img src="https://user-images.githubusercontent.com/49066484/160349107-4605d2bc-8d8f-46be-95e8-138aab69444b.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/49066484/160350245-766e5338-3542-4ec1-8278-18ba4e8715ce.png" alt="image"></p>
+<ul>
+<li>R4 ~ R11을 사용하려면, 스택에 저장 후 사용하고, return시 이전 값을 레지스터에 복원해야 한다.</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Embedded/" rel="tag"># Embedded</a>
+              <a href="/tags/ARM/" rel="tag"># ARM</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/03/24/2022-03-25-Sorting/" rel="prev" title="Sorting ">
+      <i class="fa fa-chevron-left"></i> Sorting 
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CISC-vs-RISC"><span class="nav-number">1.</span> <span class="nav-text">CISC vs RISC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CISC-Complex-Instruction-Set-Computer"><span class="nav-number">1.1.</span> <span class="nav-text">CISC (Complex Instruction Set Computer)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RISC-Reduced-Instruction-Set-Computer"><span class="nav-number">1.2.</span> <span class="nav-text">RISC (Reduced Instruction Set Computer)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ARM-mode-and-Thumb-mode"><span class="nav-number">2.</span> <span class="nav-text">ARM mode and Thumb mode</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Thumb-mode"><span class="nav-number">2.1.</span> <span class="nav-text">Thumb mode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ARM%EC%9D%98-%EB%8F%99%EC%9E%91-mode"><span class="nav-number">2.2.</span> <span class="nav-text">ARM의 동작 mode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Privileged-Mode-vs-Normal-mode"><span class="nav-number">2.3.</span> <span class="nav-text">Privileged Mode vs Normal mode</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ARM-Register"><span class="nav-number">3.</span> <span class="nav-text">ARM Register</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%ED%8A%B9%EB%B3%84%ED%95%9C-%EC%9A%A9%EB%8F%84%EC%9D%98-%EB%A0%88%EC%A7%80%EC%8A%A4%ED%84%B0"><span class="nav-number">3.1.</span> <span class="nav-text">특별한 용도의 레지스터</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Context-Switching"><span class="nav-number">3.2.</span> <span class="nav-text">Context Switching</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ARM-Exception"><span class="nav-number">4.</span> <span class="nav-text">ARM Exception</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EB%82%B4%EB%B6%80-%EC%9D%B8%ED%84%B0%EB%9F%BD%ED%8A%B8-exception"><span class="nav-number">4.1.</span> <span class="nav-text">내부 인터럽트 (exception)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EC%99%B8%EB%B6%80-%EC%9D%B8%ED%84%B0%EB%9F%BD%ED%8A%B8-interrupt"><span class="nav-number">4.2.</span> <span class="nav-text">외부 인터럽트 (interrupt)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exception-%EC%9A%B0%EC%84%A0-%EC%88%9C%EC%9C%84"><span class="nav-number">4.3.</span> <span class="nav-text">Exception 우선 순위</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exception-%EC%B2%98%EB%A6%AC-%EA%B3%BC%EC%A0%95"><span class="nav-number">4.4.</span> <span class="nav-text">Exception 처리 과정</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ARM-Procedure-Call-Standard-%ED%95%A8%EC%88%98-%ED%98%B8%EC%B6%9C-%EA%B7%9C%EC%95%BD"><span class="nav-number">5.</span> <span class="nav-text">ARM Procedure Call Standard (함수 호출 규약)</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="rvkhun" src="/images/raccoon1.jpg">
+  <p class="site-author-name" itemprop="name">rvkhun</p>
+  <div class="site-description" itemprop="description">Security Researcher / CTF Player</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:pwnkidhn@gmail.com" title="E-Mail → mailto:pwnkidhn@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://youtube.com/" title="YouTube → https:&#x2F;&#x2F;youtube.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-youtube"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/_choizy_" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;_choizy_" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-instagram"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">rvkhun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Gemini</a>
+  </div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

