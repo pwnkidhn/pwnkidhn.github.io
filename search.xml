@@ -1583,7 +1583,7 @@
       </tags>
   </entry>
   <entry>
-    <title>소프트웨 테스팅과 퍼징</title>
+    <title>sw testing과 fuzz testing</title>
     <url>/2022/03/30/2022-03-31-swtesting/</url>
     <content><![CDATA[<h1 id="소프트웨어-테스트"><a href="#소프트웨어-테스트" class="headerlink" title="소프트웨어 테스트"></a>소프트웨어 테스트</h1><ul>
 <li>소프트웨어의 결함을 최대한 찾아내 줄이고, 소프트웨어의 품질을 높인다.</li>
